@@ -20,7 +20,7 @@ const dictionary = {
     notYet:"还没有填写内容。先试试吧！", wrong:"有填写错误，请再检查一下。", good:"目前填写的内容没有错误，继续加油！", won:"恭喜完成本关！🎉", failed:"无法打开该关卡，请选择另一关。", notPlayable:"这道谜题没有可检查的完整答案，当前暂不可玩。",
     resetConfirm:"确定要清空这一关的所有填写吗？", noData:"未找到离线题库，请先导入谜题数据。", noMatch:"没有匹配的游戏类型。", load:"正在打开关卡…",
     levelHint:"按编号选关，绝不随机跳转", sizeAll:"全部尺寸", sizeTitle:"棋盘尺寸", filtered:"符合条件的关卡", unavailable:"暂不可玩", more:"查看更多关卡", backLevels:"返回选关", tipNumber:"点击选中格子，再使用数字键盘。笔记模式可添加角标候选数；多选支持拖动选择。", tipShade:"点击格子可快速涂黑，或使用下方按钮标记白格。初始线索无法修改。", tipLoop:"沿线条滑动绘制闭环；可用撤销与重做修改路径。", tipBinary:"点选方格后填写黑或白；初始圆点不可更改。",
-    loadError:"无法加载题库", levelsEmpty:"此类型暂无可用关卡。", rulesFallback:"此玩法尚无已核实的详细规则说明。请参考原题来源；可以使用棋盘进行填写和检查。", source:"原题来源"
+    loadError:"无法加载题库", levelsEmpty:"此类型暂无可用关卡。", rulesFallback:"此玩法尚无已核实的详细规则说明。请参考原题来源；可以使用棋盘进行填写和检查。", source:"原题来源", zoomHelp:"棋盘会自动适应屏幕。使用＋、－缩放，放大后点击手掌图标即可拖动棋盘。整个游戏界面不需要上下滚动。"
   },
   en: {
     offline:"PLAY OFFLINE",heroTag:"YOUR POCKET PUZZLE ARCADE",heroTitle:"A little logic. A lot of fun.",heroText:"Many puzzle styles · choose your level · progress saved automatically. Play at your own pace.",
@@ -32,7 +32,7 @@ const dictionary = {
     notYet:"Nothing entered yet. Give it a try!",wrong:"Some of your entries are incorrect. Have another look.",good:"No mistakes in your entries so far. Keep going!",won:"Puzzle completed! 🎉",failed:"Unable to open this level. Please choose another.",notPlayable:"This level has no checkable solution, so it is not playable yet.",
     resetConfirm:"Clear all of your entries for this level?",noData:"Offline puzzle data was not found. Import the data before running the app.",noMatch:"No matching games found.",load:"Opening level…",
     levelHint:"Choose by number — never random",sizeAll:"All sizes",sizeTitle:"Grid size",filtered:"matching levels",unavailable:"Not playable yet",more:"Browse more levels",backLevels:"All levels",tipNumber:"Tap to select cells, then use the number pad. Notes are small candidates; Multi supports drag selection.",tipShade:"Tap to fill quickly, or mark cells as empty using the controls. Initial clues are fixed.",tipLoop:"Drag to draw a loop. Undo and redo edit your paths.",tipBinary:"Select a cell, then choose black or white. Initial circles cannot be changed.",
-    loadError:"Unable to load library",levelsEmpty:"No levels available in this category.",rulesFallback:"Verified rules for this variant are not documented yet. Consult the original puzzle source; you can still enter and check answers on the board.",source:"Original puzzle"
+    loadError:"Unable to load library",levelsEmpty:"No levels available in this category.",rulesFallback:"Verified rules for this variant are not documented yet. Consult the original puzzle source; you can still enter and check answers on the board.",source:"Original puzzle", zoomHelp:"The board fits your screen automatically. Use + and − to zoom, then tap the hand icon to drag the enlarged board. The game screen itself does not scroll."
   }
 } as const;
 
@@ -493,6 +493,7 @@ function App() {
           <summary>{language==="zh"?"原始题面与额外线索":"Original notation and additional clues"}</summary>
           <pre>{active.record.problem}</pre>{active.record.info&&<p>{active.record.info}</p>}
         </details>}
+        <p className="rule-intro">{t.zoomHelp}</p>
         <button className="check-button modal-cta" onClick={()=>setRulesOpen(false)}><Play size={19}/>{t.gotIt}</button>
       </section>
     </div>}
