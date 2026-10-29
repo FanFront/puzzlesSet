@@ -82,7 +82,15 @@ def import_data(source: Path, all_types=False, limit=0):
                 return
             name = f"{len(output_files):03d}.json"
             (target / name).write_text(json.dumps({"puzzles": batch}, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
-            output_files.append({"path": folder.name + "/" + name, "count": len(batch)})
+            output_files.append({
+                "path": folder.name + "/" + name,
+                "count": len(batch),
+                # Indexed once at import time; level selection never needs a remote lookup.
+                "sizes": ["{}x{}".format(*(int(x) for x in item["problem"].splitlines()[0].split()[:2])) for item in batch],
+                "ready": [bool(item["solution"].strip()) and
+                          max(int(x) for x in item["problem"].splitlines()[0].split()[:2]) <= 20
+                          and folder.name in PLAYABLE for item in batch],
+            })
             batch.clear()
 
         for shard in files:
