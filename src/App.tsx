@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, CircleHelp, Eraser, Grid3X3, Layers, Pencil, Play, Redo2, RotateCcw, Search, Sparkles, Undo2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, CircleHelp, Eraser, Grid3X3, Layers, Pencil, Play, Redo2, RotateCcw, Keyboard, Search, Sparkles, Undo2, X } from "lucide-react";
 import { Board } from "./Board";
 import { genreFor } from "./config";
 import { localizedDescription, localizedRules, localizedTitle } from "./rules";
@@ -81,6 +81,7 @@ function App() {
   const [resultKind,setResultKind]=useState<"good"|"wrong"|"won"|"">("");
   const [rulesOpen,setRulesOpen]=useState(false);
   const [inputValue,setInputValue]=useState("");
+  const [showEntry,setShowEntry]=useState(false);
   const [done,setDone]=useState<Record<string,boolean>>(completedLevels);
   const cache=useRef(new Map<string,PuzzleRecord[]>());
   const timeline=useRef<{past:Snapshot[];future:Snapshot[]}>({past:[],future:[]});
@@ -204,7 +205,7 @@ function App() {
       setChosen(genre);
       setSnapshot(readSaved(genre.name,record.id));
       timeline.current={past:[],future:[]};
-      setSelection([]);setMulti(false);setPencil(false);setInputValue("");
+      setSelection([]);setMulti(false);setPencil(false);setInputValue("");setShowEntry(false);
       setMessage("");setRulesOpen(false);setScreen("game");
     }catch(e){if(mine===request.current)setMessage(e instanceof Error?e.message:t.failed);}
     finally{if(mine===request.current)setLoading(false);}
@@ -322,12 +323,13 @@ function App() {
       .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).slice(0,18);
   },[active]);
   const canMarkEmpty=!!active?.parsed.answer.some(row=>row.includes("-"));
+  const numberKeyCount=active?.genre.mode==="number"?Math.min(16,Math.max(active.parsed.rows,active.parsed.cols)):0;
   const filled=active?Object.keys(snapshot.marks).filter(key=>snapshot.marks[key]!=="-").length:0;
   const allowed=active?active.parsed.rows*active.parsed.cols-Array.from({length:active.parsed.rows*active.parsed.cols},(_,i)=>i).filter(i=>isLocked(active.parsed,active.genre,Math.floor(i/active.parsed.cols),i%active.parsed.cols)).length:0;
   const levelLabel=(n:number)=>t.level+n+t.levelSuffix;
   const keyTitle=(g:Genre)=>localizedTitle(g.name,language);
 
-  return <div className="app-shell">
+  return <div className={"app-shell"+(screen==="game"?" is-playing":"")}>
     <header className="topbar">
       <button className="brand" onClick={()=>{setScreen("library");request.current++;checkVersion.current++;setActive(null);setRulesOpen(false);setMessage("");}} aria-label="puzzlesSet home">
         <span className="brand-mark"><Grid3X3 size={21}/></span><span>puzzles<span className="brand-accent">Set</span></span>
@@ -398,43 +400,83 @@ function App() {
 
     {screen==="game"&&active&&<main className="playing">
       <div className="play-heading">
-        <button className="circle-button" aria-label={t.backLevels} onClick={back}><ChevronLeft size={23}/></button>
-        <div className="puzzle-info"><span className="eyebrow dark">{levelLabel(active.level+1)}</span><h2>{keyTitle(active.genre)}</h2><small>{active.parsed.rows} × {active.parsed.cols} · {active.record.id}</small></div>
-        <button className="rules-shortcut" onClick={()=>setRulesOpen(true)}><CircleHelp size={19}/><span>{t.help}</span></button>
-      </div>
-      <div className="puzzle-stage">
-        <div className="stage-top"><span><span className="stage-dot"/> {t.board}</span><span>{isLoop?snapshot.edges.length:filled+" / "+allowed}</span></div>
-        <div className="board-area"><Board parsed={active.parsed} genre={active.genre} state={snapshot} selected={selection} multi={multi} onSelect={selectCell} onTap={tap} onEdge={edgeAction} label={keyTitle(active.genre)}/></div>
-        {active.genre.adaptive&&<details className="original-clues"><summary>{language==="zh"?"原始题面与额外线索":"Original notation and additional clues"}</summary><pre>{active.record.problem}</pre>{active.record.info&&<p>{active.record.info}</p>}</details>}
-        <div className="board-legend" aria-label={t.legends}><span><i className="legend-given"/> {t.given}</span><span><i className="legend-player"/> {t.yours}</span></div>
-      </div>
-      <div className="game-controls">
-        <div className="toolbar">
-          <button className="tool" onClick={undo} disabled={!timeline.current.past.length}><Undo2 size={20}/><span>{t.undo}</span></button>
-          <button className="tool" onClick={redo} disabled={!timeline.current.future.length}><Redo2 size={20}/><span>{t.redo}</span></button>
-          <button className={"tool "+(multi?"tool-active":"")} onClick={()=>setMulti(v=>!v)}><Layers size={20}/><span>{t.multi}</span></button>
-          {active.genre.mode==="number"&&<button className={"tool "+(pencil?"tool-active":"")} onClick={()=>setPencil(v=>!v)}><Pencil size={20}/><span>{t.notes}</span></button>}
-          <button className="tool" onClick={reset}><RotateCcw size={20}/><span>{t.reset}</span></button>
+        <button className="circle-button" aria-label={t.backLevels} onClick={back}><ChevronLeft size={22}/></button>
+        <div className="puzzle-info">
+          <span className="eyebrow dark">{levelLabel(active.level+1)} · {active.parsed.rows}×{active.parsed.cols}</span>
+          <h2>{keyTitle(active.genre)}</h2>
         </div>
-        {active.genre.mode==="number"&&<div className="keypad">
-          <div className="numbers">{Array.from({length:Math.min(9,Math.max(active.parsed.rows,active.parsed.cols))},(_,i)=>i+1).map(n=><button className="key" key={n} onClick={()=>enter(String(n))}>{n}</button>)}</div>
-          <div className="keypad-bottom"><div className="wide-entry"><input inputMode="numeric" aria-label={t.numberPlaceholder} placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&/^\d+$/.test(inputValue)){enter(inputValue);setInputValue("");}}}/><button onClick={()=>{if(/^\d+$/.test(inputValue)){enter(inputValue);setInputValue("");}}}>{t.enter}</button></div>
-          {(active.genre.name==="Fuzuli"||active.genre.adaptive&&canMarkEmpty)&&<button className="erase" onClick={()=>enter("~")}>{t.markEmpty}</button>}
-          <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>
+        <div className="play-nav">
+          <button aria-label={t.previous} title={t.previous} disabled={active.level<=0||loading} onClick={()=>loadLevel(active.genre,active.level-1)}><ArrowLeft size={18}/></button>
+          <button aria-label={t.next} title={t.next} disabled={active.level+1>=totalLevels(catalog?.types.find(v=>v.name===active.genre.name))||loading} onClick={()=>loadLevel(active.genre,active.level+1)}><ArrowRight size={18}/></button>
+        </div>
+        <button className="rules-shortcut" aria-label={t.help} onClick={()=>setRulesOpen(true)}><CircleHelp size={20}/><span>{t.help}</span></button>
+      </div>
+
+      <section className="puzzle-stage" aria-label={t.board}>
+        <div className="stage-top">
+          <span className="stage-level-id" title={active.record.id}>{active.record.id}</span>
+          <span className="stage-mini-legend"><i className="legend-given"/>{t.given}<i className="legend-player"/>{t.yours}</span>
+          <span className="stage-progress">{isLoop?snapshot.edges.length:filled+" / "+allowed}</span>
+        </div>
+        <div className="board-area">
+          <Board key={active.genre.name+":"+active.record.id} parsed={active.parsed} genre={active.genre} state={snapshot}
+            selected={selection} multi={multi} onSelect={selectCell} onTap={tap} onEdge={edgeAction}
+            language={language} label={keyTitle(active.genre)}/>
+        </div>
+        {message&&<div role="status" className={"result result-overlay "+resultKind}>{message}</div>}
+      </section>
+
+      <div className="game-controls">
+        <div className="toolbar" role="toolbar" aria-label={language==="zh"?"编辑工具":"Editing tools"}>
+          <button className="tool" onClick={undo} disabled={!timeline.current.past.length}><Undo2 size={19}/><span>{t.undo}</span></button>
+          <button className="tool" onClick={redo} disabled={!timeline.current.future.length}><Redo2 size={19}/><span>{t.redo}</span></button>
+          <button className={"tool "+(multi?"tool-active":"")} aria-pressed={multi} onClick={()=>setMulti(v=>!v)}><Layers size={19}/><span>{t.multi}</span></button>
+          {active.genre.mode==="number"&&<button className={"tool "+(pencil?"tool-active":"")} aria-pressed={pencil} onClick={()=>setPencil(v=>!v)}><Pencil size={19}/><span>{t.notes}</span></button>}
+          <button className="tool" onClick={reset}><RotateCcw size={19}/><span>{t.reset}</span></button>
+        </div>
+
+        {active.genre.mode==="number"&&<div className="keypad" aria-label={t.number}>
+          <div className="numbers" style={{"--key-columns":Math.min(9,numberKeyCount)} as React.CSSProperties}>
+            {Array.from({length:numberKeyCount},(_,i)=>i+1).map(n=><button className="key" key={n} onClick={()=>enter(String(n))}>{n}</button>)}
+          </div>
+          <div className="keypad-aux">
+            {(active.genre.name==="Fuzuli"||active.genre.adaptive&&canMarkEmpty)&&<button className="erase" onClick={()=>enter("~")}>· {t.markEmpty}</button>}
+            <button className="erase" onClick={()=>{setShowEntry(v=>!v);setInputValue("");}} aria-expanded={showEntry}><Keyboard size={17}/>{t.enter}</button>
+            <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button>
+          </div>
         </div>}
         {active.genre.mode==="symbols"&&<div className="keypad">
-          <div className="numbers">{symbols.map(v=><button className="key" key={v} onClick={()=>enter(v)}>{v}</button>)}</div>
-          <div className="keypad-bottom"><div className="wide-entry"><input aria-label={t.numberPlaceholder} placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&inputValue.trim()){enter(inputValue.trim());setInputValue("");}}}/><button onClick={()=>{if(inputValue.trim()){enter(inputValue.trim());setInputValue("");}}}>{t.enter}</button></div>
-          {canMarkEmpty&&<button className="erase" onClick={()=>enter("~")}>{t.markEmpty}</button>}
-          <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>
+          <div className="numbers" style={{"--key-columns":Math.min(9,symbols.length||1)} as React.CSSProperties}>
+            {symbols.map(v=><button className="key" key={v} onClick={()=>enter(v)}>{v}</button>)}
+          </div>
+          <div className="keypad-aux">
+            {canMarkEmpty&&<button className="erase" onClick={()=>enter("~")}>· {t.markEmpty}</button>}
+            <button className="erase" onClick={()=>{setShowEntry(v=>!v);setInputValue("");}} aria-expanded={showEntry}><Keyboard size={17}/>{t.enter}</button>
+            <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button>
+          </div>
         </div>}
-        {active.genre.mode==="binary"&&<div className="choice-row"><button onClick={()=>enter("b")}><span className="choice-dot dark"/> {t.black}</button><button onClick={()=>enter("w")}><span className="choice-dot light"/> {t.white}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
-        {(active.genre.mode==="shade"||active.genre.mode==="nonogram"||active.genre.mode==="mixed")&&<div className="choice-row"><button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button><button onClick={()=>enter("w")}>□ {t.empty}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
-        <p className="control-tip">{isLoop?t.tipLoop:active.genre.mode==="number"?t.tipNumber:active.genre.mode==="binary"?t.tipBinary:t.tipShade}</p>
-        {message&&<div role="status" className={"result "+resultKind}>{message}</div>}
-        <div className="play-actions"><button className="check-button" onClick={check}><CheckCircle2 size={21}/>{t.check}</button><button className="secondary-button" onClick={()=>setRulesOpen(true)}><CircleHelp size={19}/>{t.help}</button></div>
-        <div className="level-stepper"><button disabled={active.level<=0||loading} onClick={()=>loadLevel(active.genre,active.level-1)}><ArrowLeft size={17}/>{t.previous}</button><button onClick={()=>openLevels(active.genre)}>{t.backLevels}</button><button disabled={active.level+1>=totalLevels(catalog?.types.find(v=>v.name===active.genre.name))||loading} onClick={()=>loadLevel(active.genre,active.level+1)}>{t.next}<ArrowRight size={17}/></button></div>
-        <p className="save-note">{t.saved}</p>
+        {active.genre.mode==="binary"&&<div className="choice-row">
+          <button onClick={()=>enter("b")}><span className="choice-dot dark"/>{t.black}</button>
+          <button onClick={()=>enter("w")}><span className="choice-dot light"/>{t.white}</button>
+          <button onClick={()=>enter("-")}><Eraser size={16}/>{t.clear}</button>
+        </div>}
+        {(active.genre.mode==="shade"||active.genre.mode==="nonogram"||active.genre.mode==="mixed")&&<div className="choice-row">
+          <button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button>
+          <button onClick={()=>enter("w")}>□ {t.empty}</button>
+          <button onClick={()=>enter("-")}><Eraser size={16}/>{t.clear}</button>
+        </div>}
+        {showEntry&&(active.genre.mode==="number"||active.genre.mode==="symbols")&&<form className="advanced-entry" onSubmit={e=>{
+          e.preventDefault();const value=inputValue.trim();
+          if(value&&(active.genre.mode!=="number"||/^\\d+$/.test(value))){enter(value);setInputValue("");setShowEntry(false);}
+        }}>
+          <input autoFocus inputMode={active.genre.mode==="number"?"numeric":"text"} aria-label={t.numberPlaceholder}
+            placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)}/>
+          <button type="submit">{t.enter}</button>
+          <button type="button" aria-label={t.back} onClick={()=>setShowEntry(false)}><X size={18}/></button>
+        </form>}
+        <div className="play-actions">
+          <button className="check-button" onClick={check}><CheckCircle2 size={20}/>{t.check}</button>
+        </div>
       </div>
     </main>}
 
@@ -447,6 +489,10 @@ function App() {
           :<p className="rule-intro">{t.rulesFallback}</p>}
         {active?.genre.name===ruleGenre.name&&/^https?:\/\//.test(active.record.source||"")&&
           <p className="rule-intro"><a href={active.record.source} target="_blank" rel="noopener noreferrer">{t.source}</a></p>}
+        {active?.genre.name===ruleGenre.name&&active.genre.adaptive&&<details className="original-clues">
+          <summary>{language==="zh"?"原始题面与额外线索":"Original notation and additional clues"}</summary>
+          <pre>{active.record.problem}</pre>{active.record.info&&<p>{active.record.info}</p>}
+        </details>}
         <button className="check-button modal-cta" onClick={()=>setRulesOpen(false)}><Play size={19}/>{t.gotIt}</button>
       </section>
     </div>}
