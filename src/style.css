@@ -11,3 +11,369 @@
 .original-clues summary{font-weight:850;cursor:pointer}
 .original-clues pre{overflow:auto;max-height:280px;font-size:11px;line-height:1.5;white-space:pre;user-select:text}
 .original-clues p{line-height:1.6}
+
+
+/* Fixed, board-first gameplay. The level picker/library retain normal page scroll;
+   the active game consumes exactly the visual viewport (also on Android). */
+.is-playing {
+  height:100vh;
+  height:100dvh;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  overscroll-behavior:none;
+  background:#eae9f2;
+}
+.is-playing .topbar {
+  flex:0 0 46px;
+  height:46px;
+  padding:0 14px;
+  box-shadow:0 2px 10px #211b361c;
+  z-index:2;
+}
+.is-playing .brand {font-size:17px;letter-spacing:-.5px;gap:7px}
+.is-playing .brand-mark {width:27px;height:27px;border-radius:8px;box-shadow:inset 0 -2px #e6ad5c}
+.is-playing .brand-mark svg {width:17px;height:17px}
+.is-playing .topbar-right {gap:8px}
+.is-playing .online-pill {display:none}
+.is-playing .language-toggle {padding:5px 9px;font-size:11px;min-height:30px}
+.is-playing .playing {
+  flex:1 1 0;
+  min-height:0;
+  width:min(100%,850px);
+  padding:7px 10px max(7px,env(safe-area-inset-bottom));
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  overflow:hidden;
+}
+.is-playing .play-heading {
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-height:42px;
+  margin:0;
+}
+.is-playing .circle-button {width:38px;height:38px;border-radius:11px}
+.is-playing .puzzle-info {min-width:0;flex:1}
+.is-playing .puzzle-info .eyebrow {font-size:10px;line-height:1.15;letter-spacing:.15px}
+.is-playing .puzzle-info h2 {
+  margin:2px 0 0;
+  font-size:clamp(16px,2.6vw,21px);
+  line-height:1.15;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.is-playing .play-nav {display:flex;gap:4px;flex:none}
+.is-playing .play-nav button,
+.is-playing .rules-shortcut {
+  min-width:37px;
+  width:37px;
+  height:37px;
+  display:grid;
+  place-items:center;
+  border:1px solid #ded9ed;
+  border-radius:11px;
+  background:#fff;
+  color:#5a4a87;
+  padding:0;
+}
+.is-playing .rules-shortcut span {display:none}
+.is-playing .play-nav button:disabled {opacity:.35}
+.is-playing .puzzle-stage {
+  position:relative;
+  flex:1 1 0;
+  min-height:0;
+  border-radius:15px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#f8f7fb;
+  border:1px solid #d7d0e6;
+  box-shadow:0 4px 18px #251b4920;
+}
+.is-playing .stage-top {
+  flex:0 0 29px;
+  height:29px;
+  padding:0 11px;
+  display:flex;
+  gap:9px;
+  font-size:10px;
+  background:#eeeaf7;
+  color:#615577;
+}
+.is-playing .stage-level-id {
+  min-width:0;
+  max-width:38%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+}
+.is-playing .stage-progress {white-space:nowrap;flex:none;margin-left:auto}
+.is-playing .stage-mini-legend {display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;white-space:nowrap}
+.is-playing .stage-mini-legend i {display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
+.is-playing .stage-mini-legend i.legend-player {margin-left:7px}
+.is-playing .board-area {
+  flex:1 1 0;
+  min-height:0;
+  display:flex;
+  width:100%;
+  padding:4px;
+  align-items:stretch;
+  justify-content:center;
+  overflow:hidden;
+  background:radial-gradient(ellipse at center,#fbfaf6 0%,#ece8e0 100%);
+}
+.is-playing .board-scroll {
+  position:relative;
+  flex:1;
+  height:100%;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  max-height:none;
+  max-width:none;
+  display:block;
+  overflow:hidden;
+  touch-action:none;
+}
+.is-playing .puzzle-board {
+  display:block;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  max-height:none;
+  flex-shrink:1;
+  border-radius:0;
+  box-shadow:none;
+  cursor:crosshair;
+}
+.is-playing .puzzle-board.is-panning {cursor:grab}
+.is-playing .puzzle-board.is-panning:active {cursor:grabbing}
+.board-zoom {
+  position:absolute;
+  right:7px;
+  bottom:7px;
+  display:flex;
+  gap:2px;
+  padding:3px;
+  border:1px solid #c8c3d3;
+  border-radius:12px;
+  background:#ffffffea;
+  box-shadow:0 2px 10px #18142c29;
+  z-index:2;
+}
+.board-zoom button {
+  display:grid;
+  place-items:center;
+  flex:none;
+  width:31px;
+  height:31px;
+  min-width:0;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:#51437c;
+  font-weight:850;
+  font-size:11px;
+  touch-action:manipulation;
+}
+.board-zoom .zoom-readout {width:42px;font-variant-numeric:tabular-nums}
+.board-zoom button.active {background:#614ba6;color:#fff}
+.board-zoom button:disabled {color:#b9b4c7;opacity:.55}
+.is-playing .board-legend,
+.is-playing .control-tip,
+.is-playing .level-stepper,
+.is-playing .save-note {display:none}
+.is-playing .game-controls {
+  position:relative;
+  flex:0 0 auto;
+  width:100%;
+  max-width:none;
+  min-height:0;
+  margin:0;
+  padding:7px 8px 8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  border:1px solid #dcd5ea;
+  border-radius:16px;
+  background:#fcfbff;
+  box-shadow:0 5px 16px #211b3622;
+}
+.is-playing .toolbar {
+  display:flex;
+  align-items:stretch;
+  height:39px;
+  margin:0;
+  gap:5px;
+}
+.is-playing .tool {
+  min-width:0;
+  min-height:39px;
+  height:39px;
+  flex:1 1 0;
+  gap:5px;
+  padding:3px 2px;
+  flex-direction:row;
+  justify-content:center;
+  border-radius:10px;
+  background:#f1eef9;
+  font-size:11px;
+  color:#665a86;
+}
+.is-playing .tool svg {width:17px;height:17px;flex:none}
+.is-playing .tool span {white-space:nowrap}
+.is-playing .tool.tool-active {background:#dbd2ff;color:#49358c;border-color:#a797dc}
+.is-playing .keypad {
+  width:100%;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:transparent;
+}
+.is-playing .numbers {
+  display:grid;
+  grid-template-columns:repeat(var(--key-columns,9),minmax(0,1fr));
+  width:100%;
+  gap:4px;
+}
+.is-playing .key {
+  height:clamp(31px,4.5dvh,43px);
+  min-width:0;
+  min-height:31px;
+  padding:0 1px;
+  border-radius:9px;
+  font-size:clamp(13px,2.8vw,18px);
+  box-shadow:0 2px 0 #dcd4ed;
+  touch-action:manipulation;
+}
+.is-playing .keypad-aux {display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.is-playing .keypad-aux .erase {
+  height:29px;
+  min-height:29px;
+  padding:3px 12px;
+  display:flex;
+  gap:5px;
+  border-radius:8px;
+  font-size:11px;
+  touch-action:manipulation;
+}
+.is-playing .choice-row {
+  width:100%;
+  gap:6px;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+.is-playing .choice-row button {height:40px;min-height:40px;padding:4px 7px;border-radius:10px;touch-action:manipulation}
+.is-playing .play-actions {margin:0;gap:0;min-height:42px}
+.is-playing .check-button {
+  width:100%;
+  min-height:42px;
+  height:42px;
+  border-radius:11px;
+  padding:5px;
+  font-size:14px;
+  box-shadow:0 2px 0 #44358d;
+}
+.is-playing .result-overlay {
+  position:absolute;
+  z-index:3;
+  left:12px;
+  right:12px;
+  bottom:8px;
+  margin:0;
+  padding:10px 12px;
+  font-size:12px;
+  border-radius:11px;
+  pointer-events:none;
+  box-shadow:0 5px 24px #1e183d30;
+}
+.is-playing .advanced-entry {
+  position:absolute;
+  z-index:5;
+  left:8px;
+  right:8px;
+  bottom:calc(100% + 7px);
+  display:flex;
+  gap:5px;
+  padding:9px;
+  border:1px solid #cec3e6;
+  border-radius:13px;
+  background:#faf8ff;
+  box-shadow:0 4px 22px #221c4536;
+}
+.is-playing .advanced-entry input {
+  flex:1;
+  min-width:0;
+  height:40px;
+  font-size:16px;
+  border:1px solid #d4c9ec;
+  border-radius:9px;
+  padding:0 10px;
+}
+.is-playing .advanced-entry button {
+  border:0;
+  border-radius:9px;
+  padding:0 12px;
+  color:#fff;
+  background:#6250af;
+  font-size:12px;
+  font-weight:800;
+}
+.is-playing .advanced-entry button:last-child {padding:0 8px;background:#e9e4f3;color:#5d5279}
+@media(max-width:420px) {
+  .is-playing .playing {padding:5px 6px max(5px,env(safe-area-inset-bottom));gap:5px}
+  .is-playing .play-heading {min-height:39px}
+  .is-playing .circle-button,.is-playing .play-nav button,.is-playing .rules-shortcut {min-width:34px;width:34px;height:34px}
+  .is-playing .game-controls {padding:6px;gap:5px;border-radius:13px}
+  .is-playing .tool {font-size:10px;gap:4px}
+  .is-playing .stage-mini-legend {font-size:9px}
+  .is-playing .stage-top {padding:0 8px}
+}
+@media(max-height:630px) {
+  .is-playing .topbar {flex-basis:40px;height:40px}
+  .is-playing .playing {padding-top:4px;padding-bottom:max(4px,env(safe-area-inset-bottom));gap:4px}
+  .is-playing .play-heading {min-height:36px}
+  .is-playing .circle-button,.is-playing .play-nav button,.is-playing .rules-shortcut {height:33px;width:33px;min-width:33px}
+  .is-playing .puzzle-info h2 {font-size:16px}
+  .is-playing .stage-top {height:24px;flex-basis:24px}
+  .is-playing .toolbar,.is-playing .tool {height:35px;min-height:35px}
+  .is-playing .key {height:32px;min-height:32px}
+  .is-playing .keypad-aux .erase {height:26px;min-height:26px}
+  .is-playing .play-actions,.is-playing .check-button {height:38px;min-height:38px}
+}
+@media(orientation:landscape) and (max-height:560px) {
+  .is-playing .playing {
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(260px,34vw);
+    grid-template-rows:auto minmax(0,1fr);
+    column-gap:8px;
+    row-gap:4px;
+  }
+  .is-playing .play-heading {grid-column:1 / -1;grid-row:1}
+  .is-playing .puzzle-stage {grid-column:1;grid-row:2;min-height:0}
+  .is-playing .game-controls {grid-column:2;grid-row:2;align-self:stretch;justify-content:center;min-height:0}
+  .is-playing .toolbar {gap:3px}
+  .is-playing .tool {flex-direction:column;gap:0}
+  .is-playing .tool svg {width:16px;height:16px}
+  .is-playing .tool span {font-size:9px}
+  .is-playing .key {height:30px;min-height:30px;font-size:13px}
+  .is-playing .keypad-aux .erase {padding:2px 5px}
+}

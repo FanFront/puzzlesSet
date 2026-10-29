@@ -42,6 +42,12 @@ python3 scripts/import_dataset.py --source ../puzzlekit-dataset/assets/data --al
 
 The importer preserves the puzzle ID, problem, solution, source, and info, repacks into lazy-loaded chunks of 200, and generates catalog.json with type and shard counts, without per-level grid-size metadata. Records without solutions remain mirrored but are not offered for play. Running sync replaces the previous generated assets. Dataset contents can change upstream; pin the upstream revision for a release freeze.
 
+## Gameplay layout
+
+Opening a level switches to a fixed-height, no-page-scroll game screen. The puzzle board takes the remaining space above a compact editing dock with Undo, Redo, Multi, Notes (where supported), Reset, number/mark inputs and Check. Previous/next and Rules are in the small top bar. On short landscape displays, the control dock sits beside the board.
+
+Boards scale to fit the available area. For larger grids use the in-board **+ / −** buttons to zoom, select the **hand** icon to drag the zoomed board, and tap the percentage to return to fit-to-screen. Only the Rules dialog scrolls for long rule texts/original notation; gameplay itself never requires scrolling to reach a control. Manual number/symbol entry is under the keyboard button to avoid permanently taking up board space.
+
 ## Build an installable Android APK
 
 The workflow [.github/workflows/android.yml](.github/workflows/android.yml) installs the Android SDK/NDK and Rust target, checks out the upstream PuzzleKit dataset, imports **all** puzzle types, generates app icons, initializes Tauri Android, compiles the arm64 APK, and uploads an **Actions artifact** named puzzlesSet-android-arm64.
