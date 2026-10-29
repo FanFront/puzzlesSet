@@ -103,7 +103,7 @@ export function isLocked(p:ParsedPuzzle,genre:Genre,r:number,c:number):boolean {
     if(clue==="-"||clue==="."||clue==="?")return false;
     if(genre.mode==="mixed")return true;
     if(genre.mode==="shade")return clue==="x"||clue==="o"||/^\d+$/.test(clue);
-    if((genre.mode==="masyu"||genre.mode==="mixed")||genre.mode==="slitherlink")return false;
+    if(genre.mode==="masyu"||genre.mode==="slitherlink")return false;
     // Numeric givens match the answer; other tokens are constraint labels,
     // displayed separately instead of accidentally blocking player input.
     return clue===p.answer[r][c];
