@@ -24,11 +24,11 @@ class ImporterTests(unittest.TestCase):
                 catalog = importer.import_data(upstream)
                 self.assertEqual(catalog["types"][0]["count"], 2)
                 self.assertEqual(catalog["types"][0]["solved"], 1)
-                self.assertEqual(catalog["types"][0]["files"][0]["sizes"], ["2x2", "2x2"])
-                self.assertEqual(catalog["types"][0]["files"][0]["ready"], [True, False])
+                self.assertEqual(catalog["types"][0]["files"][0], {"path": "Sudoku/000.json", "count": 2})
                 self.assertTrue(catalog["types"][0]["playable"])
                 game = json.loads((root / "output" / "Sudoku" / "000.json").read_text())
                 self.assertEqual(len(game["puzzles"]), 2)
+                self.assertEqual(game["puzzles"][0]["id"], "01_2x2")
                 self.assertEqual(game["puzzles"][0]["solution"], "2 2\n1 2\n2 1")
 
     def test_rejects_invalid_puzzle(self):
