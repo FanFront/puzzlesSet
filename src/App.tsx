@@ -393,7 +393,7 @@ function App() {
         <p className="control-tip">{isLoop?t.tipLoop:active.genre.mode==="number"?t.tipNumber:active.genre.mode==="binary"?t.tipBinary:t.tipShade}</p>
         {message&&<div role="status" className={"result "+resultKind}>{message}</div>}
         <div className="play-actions"><button className="check-button" onClick={check}><CheckCircle2 size={21}/>{t.check}</button><button className="secondary-button" onClick={()=>setRulesOpen(true)}><CircleHelp size={19}/>{t.help}</button></div>
-        <div className="level-stepper"><button disabled={active.level<=0||loading} onClick={()=>loadLevel(active.genre,active.level-1)}><ArrowLeft size={17}/>{t.previous}</button><button onClick={()=>openLevels(active.genre,active.level)}>{t.backLevels}</button><button disabled={active.level+1>=totalLevels(catalog?.types.find(v=>v.name===active.genre.name))||loading} onClick={()=>loadLevel(active.genre,active.level+1)}>{t.next}<ArrowRight size={17}/></button></div>
+        <div className="level-stepper"><button disabled={active.level<=0||loading} onClick={()=>loadLevel(active.genre,active.level-1)}><ArrowLeft size={17}/>{t.previous}</button><button onClick={()=>openLevels(active.genre)}>{t.backLevels}</button><button disabled={active.level+1>=totalLevels(catalog?.types.find(v=>v.name===active.genre.name))||loading} onClick={()=>loadLevel(active.genre,active.level+1)}>{t.next}<ArrowRight size={17}/></button></div>
         <p className="save-note">{t.saved}</p>
       </div>
     </main>}
