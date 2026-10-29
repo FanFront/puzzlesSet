@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, CircleH
 import { Board } from "./Board";
 import { genreFor } from "./config";
 import { localizedDescription, localizedRules, localizedTitle } from "./rules";
-import { adaptGenre, answerVectors, blankSnapshot, cellKey, checkPuzzle, gridSizeFromRecord, isLocked, parsePuzzle, readSaved, writeSaved } from "./game";
+import { adaptGenre, answerVectors, blankSnapshot, cellKey, checkPuzzle, gridSizeFromRecord, hasCheckableAnswer, isLocked, parsePuzzle, readSaved, writeSaved } from "./game";
 import type { Catalog, CatalogType, Genre, Language, ParsedPuzzle, PuzzleRecord, Snapshot } from "./types";
 
 type Active = { genre: Genre; record: PuzzleRecord; parsed: ParsedPuzzle; level: number };
@@ -155,7 +155,7 @@ function App() {
         for(let i=0;i<file.count;i++){
           const record=records[i];
           result.push({index:offset+i,id:record?.id||String(offset+i+1),
-            size:record?gridSizeFromRecord(record):"",ready:!!record?.solution?.trim()});
+            size:record?gridSizeFromRecord(record):"",ready:!!record&&hasCheckableAnswer(record)});
         }
         offset+=file.count;
       }
@@ -196,7 +196,7 @@ function App() {
         cache.current.set(file.path,records);
       }
       const record=records[offset];
-      if(!record?.solution?.trim())throw Error(t.notPlayable);
+      if(!record||!hasCheckableAnswer(record))throw Error(t.notPlayable);
       const playableGenre=adaptGenre(record,genre);
       const parsed=parsePuzzle(record,playableGenre);
       if(mine!==request.current)return;
