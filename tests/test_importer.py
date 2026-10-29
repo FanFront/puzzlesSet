@@ -24,6 +24,8 @@ class ImporterTests(unittest.TestCase):
                 catalog = importer.import_data(upstream)
                 self.assertEqual(catalog["types"][0]["count"], 2)
                 self.assertEqual(catalog["types"][0]["solved"], 1)
+                self.assertEqual(catalog["types"][0]["files"][0]["sizes"], ["2x2", "2x2"])
+                self.assertEqual(catalog["types"][0]["files"][0]["ready"], [True, False])
                 self.assertTrue(catalog["types"][0]["playable"])
                 game = json.loads((root / "output" / "Sudoku" / "000.json").read_text())
                 self.assertEqual(len(game["puzzles"]), 2)
