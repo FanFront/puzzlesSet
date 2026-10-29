@@ -467,7 +467,7 @@ function App() {
         </div>}
         {showEntry&&(active.genre.mode==="number"||active.genre.mode==="symbols")&&<form className="advanced-entry" onSubmit={e=>{
           e.preventDefault();const value=inputValue.trim();
-          if(value&&(active.genre.mode!=="number"||/^\\d+$/.test(value))){enter(value);setInputValue("");setShowEntry(false);}
+          if(value&&(active.genre.mode!=="number"||/^\d+$/.test(value))){enter(value);setInputValue("");setShowEntry(false);}
         }}>
           <input autoFocus inputMode={active.genre.mode==="number"?"numeric":"text"} aria-label={t.numberPlaceholder}
             placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)}/>
