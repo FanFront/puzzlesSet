@@ -1,30 +1,55 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Hand, Minus, Plus } from "lucide-react";
 import { allEdges, cellEdge, cellKey, isLocked, vertexEdge } from "./game";
-import type { Genre, ParsedPuzzle, Snapshot } from "./types";
+import type { Genre, Language, ParsedPuzzle, Snapshot } from "./types";
 
 type BoardProps = {
   parsed: ParsedPuzzle; genre: Genre; state: Snapshot; selected: number[];
-  multi: boolean; label: string;
+  multi: boolean; label: string; language: Language;
   onSelect: (index:number, extend:boolean)=>void;
   onTap: (index:number)=>void;
   onEdge: (key:string, action:"toggle"|"paint")=>void;
 };
 const SIZE=42;
 const COLORS={background:"#fcfbf7",ink:"#233244",selected:"#dbebff",user:"#225fc8",fill:"#26384b",star:"#dbad49"};
-export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,onTap,onEdge}:BoardProps) {
+export function Board({parsed:p,genre:g,state:s,selected,multi,label,language,onSelect,onTap,onEdge}:BoardProps) {
   const svg=useRef<SVGSVGElement>(null);
+  const [zoom,setZoom]=useState(1);
+  const [pan,setPan]=useState({x:0,y:0});
+  const [moveMode,setMoveMode]=useState(false);
+  const panGesture=useRef<{pointerId:number;clientX:number;clientY:number;x:number;y:number}|null>(null);
+  useEffect(()=>{setZoom(1);setPan({x:0,y:0});setMoveMode(false);},[p,g.name]);
+
   const pathMode=g.mode==="masyu"||g.mode==="mixed";
   const shadeMode=g.mode==="shade"||g.mode==="nonogram"||g.mode==="mixed";
   const drawing=useRef<{down:boolean;lastCell:number|null;seen:Set<string>;moved:boolean;start:number|null}>({down:false,lastCell:null,seen:new Set(),moved:false,start:null});
   const x0=g.mode==="nonogram" ? Math.max(76,Math.max(...(p.rowClues||[]).map(v=>v.length),0)*15+12):8;
   const y0=g.mode==="nonogram" ? Math.max(80,Math.max(...(p.colClues||[]).map(v=>v.length),0)*15+12):8;
   const width=x0+p.cols*SIZE+8,height=y0+p.rows*SIZE+8;
+  const viewWidth=width/zoom, viewHeight=height/zoom;
+  const clamp=(n:number,min:number,max:number)=>Math.min(max,Math.max(min,n));
+  const viewX=clamp(pan.x,0,width-viewWidth), viewY=clamp(pan.y,0,height-viewHeight);
+  const changeZoom=(factor:number)=>{
+    const next=clamp(Math.round(zoom*factor*100)/100,1,4);
+    const w=width/next,h=height/next;
+    setPan({x:clamp(viewX+(viewWidth-w)/2,0,width-w),y:clamp(viewY+(viewHeight-h)/2,0,height-h)});
+    setZoom(next);
+    if(next===1)setMoveMode(false);
+  };
+  const resetView=()=>{setZoom(1);setPan({x:0,y:0});setMoveMode(false);};
+
   const marked=new Set(s.edges), selection=new Set(selected);
   const edges=allEdges(p,g);
   const location=(event:React.PointerEvent<SVGSVGElement>)=>{
-    const rect=svg.current!.getBoundingClientRect();
-    const x=(event.clientX-rect.left)*width/rect.width-x0;
-    const y=(event.clientY-rect.top)*height/rect.height-y0;
+    // SVG's inverse screen transform also accounts for centered letterboxing
+    // and the current zoom/viewBox. Raw client-width ratios do not.
+    const point=svg.current!.createSVGPoint();
+    point.x=event.clientX;
+    point.y=event.clientY;
+    const matrix=svg.current!.getScreenCTM();
+    if(!matrix)return {x:-1,y:-1,r:-1,c:-1};
+    const mapped=point.matrixTransform(matrix.inverse());
+    const x=mapped.x-x0,y=mapped.y-y0;
     return {x,y,r:Math.floor(y/SIZE),c:Math.floor(x/SIZE)};
   };
   const nearestEdge=(x:number,y:number):string|null=>{
@@ -43,8 +68,13 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
   };
   const valid=(r:number,c:number)=>r>=0&&r<p.rows&&c>=0&&c<p.cols;
   const handleDown=(event:React.PointerEvent<SVGSVGElement>)=>{
-    if(event.button!==0 && event.pointerType==="mouse")return;
+    if(event.pointerType==="mouse"&&event.button!==0&&!(moveMode&&event.button===1))return;
     event.preventDefault();
+    if(moveMode&&zoom>1){
+      panGesture.current={pointerId:event.pointerId,clientX:event.clientX,clientY:event.clientY,x:viewX,y:viewY};
+      svg.current?.setPointerCapture(event.pointerId);
+      return;
+    }
     const at=location(event);
     drawing.current={down:true,lastCell:null,seen:new Set(),moved:false,start:null};
     svg.current?.setPointerCapture(event.pointerId);
@@ -60,6 +90,15 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     onSelect(i,multi||event.shiftKey);
   };
   const handleMove=(event:React.PointerEvent<SVGSVGElement>)=>{
+    const gesture=panGesture.current;
+    if(gesture?.pointerId===event.pointerId){
+      event.preventDefault();
+      const rect=svg.current!.getBoundingClientRect();
+      const unitsPerPixel=Math.max(viewWidth/rect.width,viewHeight/rect.height);
+      setPan({x:clamp(gesture.x-(event.clientX-gesture.clientX)*unitsPerPixel,0,width-viewWidth),
+        y:clamp(gesture.y-(event.clientY-gesture.clientY)*unitsPerPixel,0,height-viewHeight)});
+      return;
+    }
     if(!drawing.current.down)return;
     event.preventDefault();
     const at=location(event);
@@ -91,6 +130,11 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     }
   };
   const handleUp=(event:React.PointerEvent<SVGSVGElement>)=>{
+    if(panGesture.current?.pointerId===event.pointerId){
+      panGesture.current=null;
+      if(svg.current?.hasPointerCapture(event.pointerId))svg.current.releasePointerCapture(event.pointerId);
+      return;
+    }
     if(!drawing.current.down)return;
     const at=location(event);
     const d=drawing.current;
@@ -113,10 +157,12 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     return selection.has(i)?COLORS.selected:locked?"#f1ebdf":COLORS.background;
   };
   return <div className="board-scroll">
-    <svg ref={svg} viewBox={"0 0 "+width+" "+height} width={width} height={height}
-         className="puzzle-board" role="grid" aria-label={label} style={{width:width<=600?"min(100%, "+width+"px)":width,height:"auto",touchAction:"none"}}
+    <svg ref={svg} viewBox={viewX+" "+viewY+" "+viewWidth+" "+viewHeight} width="100%" height="100%"
+         preserveAspectRatio="xMidYMid meet"
+         className={"puzzle-board"+(moveMode?" is-panning":"")} role="grid" aria-label={label}
+         style={{touchAction:"none"}}
          onPointerDown={handleDown} onPointerMove={handleMove} onPointerUp={handleUp}
-         onPointerCancel={()=>{drawing.current.down=false;}}>
+         onPointerCancel={()=>{drawing.current.down=false;panGesture.current=null;}}>
       <rect width={width} height={height} fill="#e6e2d8" rx="9"/>
       {g.mode==="nonogram"&& <>
         {(p.rowClues||[]).map((clues,r)=><text key={"r"+r} x={x0-10} y={y0+(r+0.67)*SIZE}
@@ -207,5 +253,12 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
           pointerEvents="none"/>;
       })}
     </svg>
+    <div className="board-zoom" role="group" aria-label={language==="zh"?"棋盘缩放与移动":"Board zoom and pan"}>
+      <button type="button" onClick={()=>changeZoom(1/1.5)} disabled={zoom===1} aria-label={language==="zh"?"缩小":"Zoom out"}><Minus size={17}/></button>
+      <button type="button" className="zoom-readout" onClick={resetView} aria-label={language==="zh"?"重置缩放":"Reset zoom"}>{Math.round(zoom*100)}%</button>
+      <button type="button" onClick={()=>changeZoom(1.5)} disabled={zoom===4} aria-label={language==="zh"?"放大":"Zoom in"}><Plus size={17}/></button>
+      <button type="button" className={moveMode?"active":""} onClick={()=>setMoveMode(v=>!v)} disabled={zoom===1}
+        aria-pressed={moveMode} aria-label={language==="zh"?"拖动棋盘":"Pan board"}><Hand size={17}/></button>
+    </div>
   </div>;
 }
