@@ -45,6 +45,8 @@ export function adaptGenre(record:PuzzleRecord,genre:Genre):Genre {
   if(!tokens.length||!Number.isInteger(rows)||!Number.isInteger(cols))return genre;
   let mode:Genre["mode"]="symbols";
   if(tokens.every(v=>v==="x"))mode="shade";
+  else if(tokens.includes("x") && tokens.some(v=>/^[nsew]+$/.test(v))
+          && tokens.every(v=>v==="x"||/^[nsew]+$/.test(v)))mode="mixed";
   else if(tokens.every(v=>v==="b"||v==="w"))mode="binary";
   else if(!["Shakashaka","Battleship","DigitalBattleship"].includes(genre.name)
           &&tokens.every(v=>/^[nsew]+$/.test(v)))mode="masyu";
@@ -62,7 +64,7 @@ export function vertexEdge(r:number,c:number,s:number,d:number): string {
 }
 export function allEdges(p:ParsedPuzzle, genre:Genre): string[] {
   const list:string[]=[];
-  if(genre.mode==="masyu"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")){
     for(let r=0;r<p.rows;r++) for(let c=0;c<p.cols;c++){
       if(c+1<p.cols) list.push(cellEdge(r,c,r,c+1));
       if(r+1<p.rows) list.push(cellEdge(r,c,r+1,c));
@@ -77,7 +79,7 @@ export function allEdges(p:ParsedPuzzle, genre:Genre): string[] {
 }
 export function solutionEdges(p:ParsedPuzzle,genre:Genre): Set<string> {
   const edges=new Set<string>();
-  if(genre.mode==="masyu"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")){
     for(let r=0;r<p.rows;r++) for(let c=0;c<p.cols;c++){
       const value=p.answer[r][c].toLowerCase();
       if(value.includes("e") && c+1<p.cols)edges.add(cellEdge(r,c,r,c+1));
@@ -99,8 +101,9 @@ export function isLocked(p:ParsedPuzzle,genre:Genre,r:number,c:number):boolean {
   if(genre.name==="Hitori"||genre.name==="Mosaic")return false;
   if(genre.adaptive){
     if(clue==="-"||clue==="."||clue==="?")return false;
+    if(genre.mode==="mixed")return true;
     if(genre.mode==="shade")return clue==="x"||clue==="o"||/^\d+$/.test(clue);
-    if(genre.mode==="masyu"||genre.mode==="slitherlink")return false;
+    if((genre.mode==="masyu"||genre.mode==="mixed")||genre.mode==="slitherlink")return false;
     // Numeric givens match the answer; other tokens are constraint labels,
     // displayed separately instead of accidentally blocking player input.
     return clue===p.answer[r][c];
@@ -116,12 +119,23 @@ export function isMarked(solutionToken:string,genre:Genre):boolean {
 /** Only player-entered answers are sent to the checker. Clues, blanks, and notes are excluded. */
 export function answerVectors(p:ParsedPuzzle,genre:Genre,s:Snapshot): {expected:string[];actual:string[];complete:boolean} {
   const expected:string[]=[],actual:string[]=[];
-  if(genre.mode==="masyu"||genre.mode==="slitherlink"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")||genre.mode==="slitherlink"){
     const keys=new Set(allEdges(p,genre));
     const wanted=solutionEdges(p,genre);
     const entered=new Set(s.edges.filter(key=>keys.has(key)));
     for(const key of entered){expected.push(wanted.has(key)?"1":"0");actual.push("1");}
-    const complete=entered.size===wanted.size&&[...wanted].every(key=>entered.has(key));
+    let complete=entered.size===wanted.size&&[...wanted].every(key=>entered.has(key));
+    if(genre.mode==="mixed"){
+      for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){
+        if(isLocked(p,genre,r,c))continue;
+        const mark=s.marks[cellKey(r,c)];
+        if(p.answer[r][c]==="x"&&mark!=="x")complete=false;
+        if(mark==="x"||mark==="w"){
+          expected.push(p.answer[r][c]==="x"?"1":"0");
+          actual.push(mark==="x"?"1":"0");
+        }
+      }
+    }
     return {expected,actual,complete};
   }
   let complete=true;
