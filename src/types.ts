@@ -1,3 +1,4 @@
+export type Language = "zh" | "en";
 export type Mode = "number" | "binary" | "shade" | "nonogram" | "masyu" | "slitherlink";
 export type Genre = { name: string; title: string; mode: Mode; symbol: string; description: string; regionOnly?: boolean; clueOnly?: boolean };
 export type PuzzleRecord = { id: string; problem: string; solution: string; source?: string; info?: string };
@@ -9,4 +10,4 @@ export type ParsedPuzzle = {
   regions?: string[][]; rowClues?: string[][]; colClues?: string[][];
 };
 export type Snapshot = { marks: Record<string,string>; notes: Record<string,string[]>; edges: string[] };
-export type Check = { correct: boolean; mismatches: number[]; total: number };
+export type Check = { hasWrong: boolean; checked: number };
