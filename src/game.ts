@@ -5,7 +5,17 @@ const lines = (text: string) => text.trim().split(/\r?\n/).map(s=>s.trim().split
 const padded = (line: string[] | undefined, columns: number) =>
   Array.from({length: columns},(_,i)=>line?.[i] || "-");
 
+/** Reject missing or non-rectangular stored answers before offering Check. */
+export function hasCheckableAnswer(record:PuzzleRecord):boolean {
+  if(!record.solution?.trim())return false;
+  const problem=lines(record.problem),answer=lines(record.solution);
+  const rows=Number(problem[0]?.[0]),cols=Number(problem[0]?.[1]);
+  if(!Number.isInteger(rows)||!Number.isInteger(cols)||rows<1||cols<1||rows>120||cols>120)return false;
+  if(Number(answer[0]?.[0])!==rows||Number(answer[0]?.[1])!==cols)return false;
+  return answer.length>=rows+1 && answer.slice(1,rows+1).every(row=>row.length===cols);
+}
 export function parsePuzzle(record: PuzzleRecord, genre: Genre): ParsedPuzzle {
+  if(!hasCheckableAnswer(record))throw new Error("No complete rectangular answer");
   const problem = lines(record.problem), solution = lines(record.solution);
   const rows = Number(problem[0]?.[0]), cols = Number(problem[0]?.[1]);
   if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows < 1 || cols < 1 || rows > 120 || cols > 120)
