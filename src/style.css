@@ -6,3 +6,8 @@
 .level-tile:disabled{opacity:.43;cursor:not-allowed}
 .keypad .numbers{grid-template-columns:repeat(auto-fit,minmax(42px,1fr))}
 @media(max-width:560px){.level-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.level-tile{min-height:72px;aspect-ratio:auto}.level-id{font-size:10px}}
+
+.original-clues{margin:10px 14px;padding:9px 13px;border:1px solid #e1dbea;border-radius:11px;background:#faf9fe;color:#5a5370;font-size:12px}
+.original-clues summary{font-weight:850;cursor:pointer}
+.original-clues pre{overflow:auto;max-height:280px;font-size:11px;line-height:1.5;white-space:pre;user-select:text}
+.original-clues p{line-height:1.6}
