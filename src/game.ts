@@ -31,10 +31,10 @@ export function parsePuzzle(record: PuzzleRecord, genre: Genre): ParsedPuzzle {
 /** Parse the dimensions in an original upstream key, e.g. 20_12x12.
  * No separate size/classification index is generated during import or CI. */
 export function gridSizeFromRecord(record:PuzzleRecord):string {
-  const match=record.id.match(/(?:^|_)(\\d+)x(\\d+)(?:_|$)/i);
+  const match=record.id.match(/(?:^|_)(\d+)x(\d+)(?:_|$)/i);
   if(match)return Number(match[1])+"x"+Number(match[2]);
-  const header=record.problem.trim().split(/\\s+/,2);
-  return header.length===2&&header.every(v=>/^\\d+$/.test(v))?header[0]+"x"+header[1]:"";
+  const header=record.problem.trim().split(/\s+/,2);
+  return header.length===2&&header.every(v=>/^\d+$/.test(v))?header[0]+"x"+header[1]:"";
 }
 /** Select controls from the actual answer encoding for unlisted puzzle types. */
 export function adaptGenre(record:PuzzleRecord,genre:Genre):Genre {
@@ -48,7 +48,7 @@ export function adaptGenre(record:PuzzleRecord,genre:Genre):Genre {
   else if(tokens.every(v=>v==="b"||v==="w"))mode="binary";
   else if(!["Shakashaka","Battleship","DigitalBattleship"].includes(genre.name)
           &&tokens.every(v=>/^[nsew]+$/.test(v)))mode="masyu";
-  else if(tokens.every(v=>/^\\d+$/.test(v)))mode="number";
+  else if(tokens.every(v=>/^\d+$/.test(v)))mode="number";
   return {...genre,mode};
 }
 export function cellKey(r:number,c:number): string {return String(r)+","+String(c);}
@@ -99,7 +99,7 @@ export function isLocked(p:ParsedPuzzle,genre:Genre,r:number,c:number):boolean {
   if(genre.name==="Hitori"||genre.name==="Mosaic")return false;
   if(genre.adaptive){
     if(clue==="-"||clue==="."||clue==="?")return false;
-    if(genre.mode==="shade")return clue==="x"||clue==="o"||/^\\d+$/.test(clue);
+    if(genre.mode==="shade")return clue==="x"||clue==="o"||/^\d+$/.test(clue);
     if(genre.mode==="masyu"||genre.mode==="slitherlink")return false;
     // Numeric givens match the answer; other tokens are constraint labels,
     // displayed separately instead of accidentally blocking player input.
