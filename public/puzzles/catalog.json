@@ -427,7 +427,47 @@
       "files": [
         {
           "path": "Fuzuli/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "5x5",
+            "5x5",
+            "5x5",
+            "5x5",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -439,7 +479,47 @@
       "files": [
         {
           "path": "Binairo/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "8x8",
+            "8x8",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "12x12",
+            "14x14",
+            "10x10",
+            "10x10",
+            "12x12",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -451,7 +531,47 @@
       "files": [
         {
           "path": "YinYang/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x6",
+            "6x6",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "12x12",
+            "12x12",
+            "12x12"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -463,7 +583,47 @@
       "files": [
         {
           "path": "Hitori/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "4x4",
+            "5x5",
+            "5x5",
+            "8x8",
+            "6x6",
+            "7x7",
+            "7x7",
+            "8x8",
+            "8x8",
+            "8x8",
+            "5x5",
+            "5x5",
+            "5x5",
+            "5x5",
+            "8x8",
+            "8x8",
+            "8x8",
+            "8x8"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -475,7 +635,47 @@
       "files": [
         {
           "path": "Nurikabe/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18",
+            "6x6",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -487,7 +687,47 @@
       "files": [
         {
           "path": "Kurotto/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -499,7 +739,47 @@
       "files": [
         {
           "path": "Kuromasu/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "9x9",
+            "13x13",
+            "13x13",
+            "13x13",
+            "13x13",
+            "13x13",
+            "17x17",
+            "17x17",
+            "11x11"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -511,7 +791,47 @@
       "files": [
         {
           "path": "Norinori/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
