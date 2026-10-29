@@ -13,6 +13,8 @@ const SIZE=42;
 const COLORS={background:"#fcfbf7",ink:"#233244",selected:"#dbebff",user:"#225fc8",fill:"#26384b",star:"#dbad49"};
 export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,onTap,onEdge}:BoardProps) {
   const svg=useRef<SVGSVGElement>(null);
+  const pathMode=g.mode==="masyu"||g.mode==="mixed";
+  const shadeMode=g.mode==="shade"||g.mode==="nonogram"||g.mode==="mixed";
   const drawing=useRef<{down:boolean;lastCell:number|null;seen:Set<string>;moved:boolean;start:number|null}>({down:false,lastCell:null,seen:new Set(),moved:false,start:null});
   const x0=g.mode==="nonogram" ? Math.max(76,Math.max(...(p.rowClues||[]).map(v=>v.length),0)*15+12):8;
   const y0=g.mode==="nonogram" ? Math.max(80,Math.max(...(p.colClues||[]).map(v=>v.length),0)*15+12):8;
@@ -53,7 +55,7 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     }
     if(!valid(at.r,at.c))return;
     const i=at.r*p.cols+at.c;
-    if(g.mode==="masyu"){drawing.current.lastCell=i;return;}
+    if(pathMode){drawing.current.lastCell=i;if(g.mode==="mixed"){drawing.current.start=i;onSelect(i,multi||event.shiftKey);}return;}
     drawing.current.start=i;
     onSelect(i,multi||event.shiftKey);
   };
@@ -70,9 +72,10 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     }
     if(!valid(at.r,at.c))return;
     const i=at.r*p.cols+at.c;
-    if(g.mode==="masyu"){
+    if(pathMode){
       const prev=drawing.current.lastCell;
       if(prev!==null&&prev!==i){
+        drawing.current.moved=true;
         const r=Math.floor(prev/p.cols),c=prev%p.cols;
         if(Math.abs(r-at.r)+Math.abs(c-at.c)===1){
           const key=cellEdge(r,c,at.r,at.c);
@@ -91,7 +94,7 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
     if(!drawing.current.down)return;
     const at=location(event);
     const d=drawing.current;
-    if((g.mode==="shade"||g.mode==="nonogram")&&!multi&&!d.moved&&d.start!==null&&valid(at.r,at.c)&&d.start===at.r*p.cols+at.c)onTap(d.start);
+    if(shadeMode&&!multi&&!d.moved&&d.start!==null&&valid(at.r,at.c)&&d.start===at.r*p.cols+at.c)onTap(d.start);
     d.down=false;
     d.lastCell=null;
     if(svg.current?.hasPointerCapture(event.pointerId))svg.current.releasePointerCapture(event.pointerId);
@@ -104,9 +107,9 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
       if(value==="b")return locked?"#253342":"#245f9f";
       if(value==="w")return locked?"#f2ede0":"#e6f0ff";
     }
-    if(g.mode==="shade"&&locked)return clue==="x"?"#26384b":"#eee9dc";
-    if((g.mode==="shade"||g.mode==="nonogram")&&v==="x")return "#285a94";
-    if((g.mode==="shade"||g.mode==="nonogram")&&v==="w")return "#eaf2ff";
+    if((g.mode==="shade"||g.mode==="mixed")&&locked)return clue==="x"?"#26384b":"#eee9dc";
+    if(shadeMode&&v==="x")return "#285a94";
+    if(shadeMode&&v==="w")return "#eaf2ff";
     return selection.has(i)?COLORS.selected:locked?"#f1ebdf":COLORS.background;
   };
   return <div className="board-scroll">
@@ -135,7 +138,7 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
           return r===p.rows-1||p.regions[r+1][c]!==region;
         };
         const sudokuBox = g.name==="Sudoku" && p.rows===9 && p.cols===9;
-        const hasShade=(g.mode==="shade"||g.mode==="nonogram")&&v==="x";
+        const hasShade=shadeMode&&v==="x";
         const displayed = (g.mode==="number"||g.mode==="symbols") ? (g.clueOnly?v:locked?clue:v) :
           g.mode==="binary" ? (locked?clue:v) : "";
         return <g key={i} role="gridcell" aria-label={"row "+(r+1)+" column "+(c+1)}>
@@ -151,30 +154,30 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
           {g.mode==="binary" && (displayed==="w"||displayed==="b") && 
             <circle cx={x+SIZE/2} cy={y+SIZE/2} r="11" stroke={locked?"#cbb47d":displayed==="b"?"#e1efff":"#287acb"}
               strokeWidth="2" fill={displayed==="b"?(locked?"#162639":"#2469bf"):"#fff"}/>}
-          {(g.mode==="shade"||g.mode==="nonogram") && g.name==="Starbattle"&&hasShade &&
+          {shadeMode && g.name==="Starbattle"&&hasShade &&
             <text x={x+SIZE/2} y={y+SIZE/2+9} textAnchor="middle" fontSize="27" fill="#e5b95b">★</text>}
-          {(g.mode==="shade"||g.mode==="nonogram") && g.name==="Akari"&&hasShade &&
+          {shadeMode && g.name==="Akari"&&hasShade &&
             <text x={x+SIZE/2} y={y+SIZE/2+9} textAnchor="middle" fontSize="26" fill="#f4c65c">☀</text>}
-          {(g.mode==="shade"||g.mode==="nonogram") && g.name==="Minesweeper"&&hasShade &&
+          {shadeMode && g.name==="Minesweeper"&&hasShade &&
             <text x={x+SIZE/2} y={y+SIZE/2+8} textAnchor="middle" fontSize="24" fill="#f4c65c">✹</text>}
-          {g.mode==="shade"&&locked&&clue!=="-"&&
+          {(g.mode==="shade"||g.mode==="mixed")&&locked&&clue!=="-"&&
             <text x={x+SIZE/2} y={y+SIZE/2+7} fill={clue==="x"?"#fff":"#3c4855"}
               fontSize={clue.length>2?12:19} textAnchor="middle" fontWeight="650">{clue==="o"?"○":clue==="x"?"■":clue}</text>}
-          {g.mode==="shade"&&!locked&&clue!=="-"&&clue!=="."&&
+          {(g.mode==="shade"||g.mode==="mixed")&&!locked&&clue!=="-"&&clue!=="."&&
             <text x={x+SIZE/2} y={y+SIZE/2+7} fontWeight="700" textAnchor="middle"
               fontSize={clue.length>3?12:18} fill={v==="x"?"#ffffff":"#41566e"}>{clue}</text>}
           {g.adaptive&&(g.mode==="number"||g.mode==="symbols")&&!locked&&clue!=="-"&&clue!=="."&&
             <text x={x+3} y={y+10} fontSize="10" fontWeight="700" fill="#876f4d">{clue}</text>}
-          {g.adaptive&&g.mode==="masyu"&&clue!=="-"&&clue!=="b"&&clue!=="w"&&
+          {g.adaptive&&pathMode&&clue!=="-"&&clue!=="b"&&clue!=="w"&&
             <text x={x+SIZE/2} y={y+SIZE/2+6} fontSize={clue.length>3?10:15}
               fontWeight="700" textAnchor="middle" fill="#635472">{clue}</text>}
           {g.mode==="slitherlink"&&clue!=="-"&&
             <text x={x+SIZE/2} y={y+SIZE/2+7} textAnchor="middle" fontSize="20" fill="#253447">{clue}</text>}
-          {g.mode==="masyu"&&(clue==="b"||clue==="w")&&
+          {pathMode&&(clue==="b"||clue==="w")&&
             <circle cx={x+SIZE/2} cy={y+SIZE/2} r="10" fill={clue==="b"?"#273747":"#fff"} stroke="#263747" strokeWidth="2"/>}
           {(g.mode==="number"||g.mode==="symbols")&&!locked&&v==="~"&&
             <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="20" fill="#2469bf">·</text>}
-          {(g.mode==="shade"||g.mode==="nonogram")&&v==="w"&&
+          {shadeMode&&v==="w"&&
             <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="22" fontWeight="800" fill="#8ba7c9">×</text>}
           {g.mode==="number"&&!locked&&(s.notes[key]||[]).map((v,j)=><text key={j}
             x={x+4+(j%3)*12} y={y+10+Math.floor(j/3)*11} fontSize="9" fontWeight="650" fill="#6b87b0">{v}</text>)}
@@ -194,11 +197,11 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
         const r=Math.floor(i/(p.cols+1)),c=i%(p.cols+1);
         return <circle key={"d"+i} cx={x0+c*SIZE} cy={y0+r*SIZE} r="2.6" fill="#627486"/>;
       })}
-      {(g.mode==="slitherlink"||g.mode==="masyu")&&edges.map((edge,i)=>{
+      {(g.mode==="slitherlink"||pathMode)&&edges.map((edge,i)=>{
         if(!marked.has(edge))return null;
         const parts=edge.split(":");
         const [r1,c1]=parts[1].split(",").map(Number),[r2,c2]=parts[2].split(",").map(Number);
-        const atCenter=g.mode==="masyu"?SIZE/2:0;
+        const atCenter=pathMode?SIZE/2:0;
         return <line key={edge} x1={x0+c1*SIZE+atCenter} y1={y0+r1*SIZE+atCenter}
           x2={x0+c2*SIZE+atCenter} y2={y0+r2*SIZE+atCenter} stroke="#287eae" strokeWidth="5.5" strokeLinecap="round"
           pointerEvents="none"/>;
