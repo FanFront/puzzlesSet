@@ -1259,7 +1259,47 @@
       "files": [
         {
           "path": "Nonogram/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "20x20",
+            "20x20",
+            "20x20",
+            "20x20",
+            "20x20",
+            "20x20",
+            "15x15",
+            "15x15",
+            "15x15",
+            "10x10",
+            "20x20",
+            "20x20",
+            "20x20",
+            "15x15",
+            "15x15",
+            "20x20",
+            "15x15",
+            "20x20"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -1271,7 +1311,47 @@
       "files": [
         {
           "path": "Masyu/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18",
+            "6x6"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -1283,7 +1363,47 @@
       "files": [
         {
           "path": "Slitherlink/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "17x17",
+            "10x18",
+            "10x18",
+            "10x10",
+            "10x18",
+            "12x16",
+            "10x18",
+            "10x10",
+            "16x19",
+            "16x19",
+            "10x14",
+            "10x10",
+            "10x10",
+            "10x10",
+            "4x4",
+            "10x19",
+            "15x20",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     }
