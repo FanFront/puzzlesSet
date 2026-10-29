@@ -41,8 +41,8 @@ class ImporterTests(unittest.TestCase):
                 (directory / f"{name}_dataset_000.json").write_text(json.dumps({
                     "data": {
                         "20_12x12": {
-                            "problem": "2 2\\n- -\\n- -",
-                            "solution": "2 2\\nx -\\n- x",
+                            "problem": "2 2\n- -\n- -",
+                            "solution": "2 2\nx -\n- x",
                         }
                     }
                 }))
