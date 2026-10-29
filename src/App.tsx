@@ -100,7 +100,6 @@ function App() {
     return ()=>document.removeEventListener("keydown",onKey);
   },[rulesOpen]);
 
-  const clearResult=()=>{checkVersion.current++;setMessage("");setResultKind("");};
   const commit=useCallback((change:(current:Snapshot)=>Snapshot)=>{
     checkVersion.current++;setResultKind("");setMessage("");
     setSnapshot(current=>{
@@ -130,7 +129,7 @@ function App() {
       return next;
     });
   },[]);
-  const openLevels=(genre:Genre,focus?:number)=>{
+  const openLevels=(genre:Genre)=>{
     request.current++;checkVersion.current++;
     if(chosen?.name!==genre.name){setSizeFilter("all");setPage(0);}
     setChosen(genre);setActive(null);
@@ -138,7 +137,7 @@ function App() {
     setMessage("");setResultKind("");setRulesOpen(false);
   };
   const back=()=>{
-    if(screen==="game"&&active){openLevels(active.genre,active.level);return;}
+    if(screen==="game"&&active){openLevels(active.genre);return;}
     request.current++;checkVersion.current++;
     setScreen("library");setChosen(null);setActive(null);setMessage("");setRulesOpen(false);
   };
