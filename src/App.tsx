@@ -444,7 +444,7 @@ function App() {
         {localizedRules(ruleGenre.name,language).length>0
           ?<ol className="rule-list">{localizedRules(ruleGenre.name,language).map((rule,i)=><li key={i}>{rule}</li>)}</ol>
           :<p className="rule-intro">{t.rulesFallback}</p>}
-        {active?.genre.name===ruleGenre.name&&/^https?:\\/\\//.test(active.record.source||"")&&
+        {active?.genre.name===ruleGenre.name&&/^https?:\/\//.test(active.record.source||"")&&
           <p className="rule-intro"><a href={active.record.source} target="_blank" rel="noopener noreferrer">{t.source}</a></p>}
         <button className="check-button modal-cta" onClick={()=>setRulesOpen(false)}><Play size={19}/>{t.gotIt}</button>
       </section>
