@@ -46,9 +46,38 @@ jobs:
         run: npx tauri android init --ci
       - name: Build installable arm64 APK
         run: npx tauri android build --apk --target aarch64
+      - name: Sign APK for sideload or release distribution
+        env:
+          SIGNING_STORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SIGNING_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          KEYSTORE="$RUNNER_TEMP/puzzlesSet.jks"
+          if [[ -n "$SIGNING_STORE_B64" ]]; then
+            printf '%s' "$SIGNING_STORE_B64" | base64 --decode > "$KEYSTORE"
+            PASS="$SIGNING_STORE_PASS"
+            KEY_PASS="${SIGNING_KEY_PASS:-$PASS}"
+            ALIAS="${SIGNING_ALIAS:-puzzlesset}"
+            echo "Using configured release signing key"
+          else
+            PASS="temporary-testing-key"
+            KEY_PASS="$PASS"
+            ALIAS="puzzlesset"
+            keytool -genkeypair -noprompt -keystore "$KEYSTORE" -storepass "$PASS" -keypass "$KEY_PASS" -alias "$ALIAS" -keyalg RSA -keysize 2048 -validity 3650 -dname "CN=puzzlesSet Testing, O=puzzlesSet"
+            echo "::warning::No release signing key configured. Installable test APK only; signatures change on each CI run."
+          fi
+          ROOT="src-tauri/gen/android/app/build/outputs/apk"
+          APK="$(find "$ROOT" -type f -name '*.apk' | head -n 1)"
+          test -n "$APK"
+          TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          "$TOOLS/zipalign" -f -p 4 "$APK" "$RUNNER_TEMP/aligned.apk"
+          "$TOOLS/apksigner" sign --ks "$KEYSTORE" --ks-pass "pass:$PASS" --key-pass "pass:$KEY_PASS" --ks-key-alias "$ALIAS" --out "$ROOT/puzzlesSet-arm64-signed.apk" "$RUNNER_TEMP/aligned.apk"
+          "$TOOLS/apksigner" verify --verbose "$ROOT/puzzlesSet-arm64-signed.apk"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: puzzlesSet-android-arm64
-          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+          path: src-tauri/gen/android/app/build/outputs/apk/puzzlesSet-arm64-signed.apk
           if-no-files-found: error
