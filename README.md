@@ -2,9 +2,9 @@
 
 An **offline-first Android logic puzzle app**, built with Tauri 2, Rust, React, and TypeScript. Puzzles and stored answers come from [SmilingWayne/puzzlekit-dataset](https://github.com/SmilingWayne/puzzlekit-dataset). There is **no solver** in this release.
 
-## Playable first batch
+## Puzzle support
 
-27 puzzle genres, sharing controls across 5 input models:
+The original 27 genres have dedicated controls across five input models. Other upstream genres with stored solutions are now offered with runtime-detected numbers, black/white, shading, symbols, loops and mixed shading/loop controls:
 
 - Numbers: Sudoku, Hidoku, Hakyuu, Suguru, Jigsaw Sudoku, KenKen, Killer Sudoku, Cojun, Fuzuli
 - Binary: Binairo, Yin–Yang
@@ -12,9 +12,9 @@ An **offline-first Android logic puzzle app**, built with Tauri 2, Rust, React, 
 - Picture clues: Nonogram
 - Loops: Masyu, Slitherlink
 
-Includes **Simplified Chinese (default) and English** UI, Chinese and English rule guides for all 27 games, **numbered level selection with grid-size filters**, number entry, superscript **Notes**, **Multi** selection and drag gestures, shade/binary/line input, Undo/Redo, Reset, automatic local saves, and **Check Entries**. Initial numbers and Boolean symbols are visually distinguished from player inputs and cannot be edited.
+Includes **Simplified Chinese (default) and English** UI, Chinese and English rule guides for the original 27 games plus additional genres, and a source/reference fallback for variants not yet documented, **numbered level selection with grid-size filters**, number entry, superscript **Notes**, **Multi** selection and drag gestures, shade/binary/line input, Undo/Redo, Reset, automatic local saves, and **Check Entries**. Initial numbers and Boolean symbols are visually distinguished from player inputs and cannot be edited.
 
-**Check Entries** checks **only the entries the player explicitly made** against the stored answer. Unanswered cells, initial clues, and pencil notes do not count as mistakes. The checker returns only whether any entries are wrong: **it never reveals or highlights incorrect positions**. When all required entries are correct, the game can mark the level complete. Shading games allow explicit filled/empty marks; blank remains unanswered. Rust performs the check on Android, with a JavaScript browser fallback. No solver, hints, or alternate-solution validation is performed. The game currently loads solved instances up to 20×20 for touch usability. Larger puzzles remain imported for later.
+**Check Entries** checks **only the entries the player explicitly made** against the stored answer. Unanswered cells, initial clues, and pencil notes do not count as mistakes. The checker returns only whether any entries are wrong: **it never reveals or highlights incorrect positions**. When all required entries are correct, the game can mark the level complete. Shading games allow explicit filled/empty marks; blank remains unanswered. Rust performs the check on Android, with a JavaScript browser fallback. No solver, hints, or alternate-solution validation is performed. The game can load larger grids, which scroll on smaller screens. Unsolved records have no answer to check.
 
 ## Import the dataset
 
@@ -24,7 +24,7 @@ Local development:
 
 ~~~bash
 npm install
-npm run data:sync         # clones PuzzleKit dataset, imports playable genres
+npm run data:sync         # clones PuzzleKit dataset and imports all genres
 npm run dev
 ~~~
 
@@ -40,7 +40,7 @@ Or from an existing checkout:
 python3 scripts/import_dataset.py --source ../puzzlekit-dataset/assets/data --all
 ~~~
 
-The importer preserves the puzzle ID, problem, solution, source, and info, repacks into lazy-loaded chunks of 200, and generates catalog.json with counts and supported flags. Records without solutions remain mirrored but are not offered for play. Running sync replaces the previous generated assets. Dataset contents can change upstream; pin the upstream revision for a release freeze.
+The importer preserves the puzzle ID, problem, solution, source, and info, repacks into lazy-loaded chunks of 200, and generates catalog.json with type and shard counts, without per-level grid-size metadata. Records without solutions remain mirrored but are not offered for play. Running sync replaces the previous generated assets. Dataset contents can change upstream; pin the upstream revision for a release freeze.
 
 ## Build an installable Android APK
 
@@ -68,6 +68,8 @@ The APK is for testing/sideloading. Production publishing requires signing keys 
 
 ## Caveats
 
-This initial release checks **exact stored answers**, not logical correctness; other valid solutions can fail. Some puzzle formats encode answers differently from their input (e.g. Masyu directional cells; Slitherlink inside/outside shading); adapters normalize them for interaction. Other genres are imported for future releases but are not advertised as playable. Large grids need further mobile accessibility work. Undo history is session-only; current state is saved between sessions.
+This initial release checks **exact stored answers**, not logical correctness; other valid solutions can fail. Some puzzle formats encode answers differently from their input (e.g. Masyu directional cells; Slitherlink inside/outside shading); adapters normalize them for interaction. All solved genres are offered with answer-format-adaptive entry controls, but specialized board visuals and complete verified rules are not yet available for every genre. Large grids need further mobile accessibility work. Undo history is session-only; current state is saved between sessions.
 
-**Level metadata:** Each offline catalog shard contains the grid sizes and available-state flags of its levels. This enables exact grid-size filtering without opening every puzzle or renumbering the original level order. The bundled sample catalog includes the same metadata.\n\n**Data provenance:** The solver source repository uses MIT, but the dataset consists of third-party puzzles with varying source URLs. Review dataset redistribution and commercial-use rights before broad release or publication. Do not assume the solver license covers third-party puzzle content.
+**Level metadata:** Grid-size filtering reads each original record key (for example, `20_12x12`) when the player opens a puzzle series. There is no generated grid-size classification or per-level `sizes`/`ready` catalog metadata. Shards of the chosen series are cached after loading.
+
+**Data provenance:** The solver source repository uses MIT, but the dataset consists of third-party puzzles with varying source URLs. Review dataset redistribution and commercial-use rights before broad release or publication. Do not assume the solver license covers third-party puzzle content.

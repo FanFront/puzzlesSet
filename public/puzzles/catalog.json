@@ -11,47 +11,7 @@
       "files": [
         {
           "path": "Sudoku/000.json",
-          "count": 18,
-          "sizes": [
-            "9x9",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16",
-            "16x16"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -63,47 +23,7 @@
       "files": [
         {
           "path": "Hidoku/000.json",
-          "count": 18,
-          "sizes": [
-            "7x7",
-            "7x7",
-            "7x7",
-            "7x7",
-            "7x7",
-            "8x8",
-            "8x8",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -115,47 +35,7 @@
       "files": [
         {
           "path": "Hakyuu/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "9x9",
-            "8x8",
-            "7x7",
-            "6x6",
-            "8x8",
-            "7x7",
-            "10x10",
-            "7x7",
-            "9x9",
-            "9x9",
-            "12x12",
-            "10x18"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -167,47 +47,7 @@
       "files": [
         {
           "path": "Suguru/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -219,47 +59,7 @@
       "files": [
         {
           "path": "JigsawSudoku/000.json",
-          "count": 18,
-          "sizes": [
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "5x5",
-            "5x5",
-            "5x5",
-            "6x6",
-            "5x5",
-            "5x5",
-            "5x5",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -271,47 +71,7 @@
       "files": [
         {
           "path": "KenKen/000.json",
-          "count": 18,
-          "sizes": [
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "5x5",
-            "5x5",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "7x7",
-            "7x7",
-            "8x8",
-            "8x8"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -323,47 +83,7 @@
       "files": [
         {
           "path": "KillerSudoku/000.json",
-          "count": 18,
-          "sizes": [
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "4x4",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -375,47 +95,7 @@
       "files": [
         {
           "path": "Cojun/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "6x6",
-            "6x6",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -427,47 +107,7 @@
       "files": [
         {
           "path": "Fuzuli/000.json",
-          "count": 18,
-          "sizes": [
-            "5x5",
-            "5x5",
-            "5x5",
-            "5x5",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -479,47 +119,7 @@
       "files": [
         {
           "path": "Binairo/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "8x8",
-            "8x8",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "12x12",
-            "14x14",
-            "10x10",
-            "10x10",
-            "12x12",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -531,47 +131,7 @@
       "files": [
         {
           "path": "YinYang/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "6x6",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "12x12",
-            "12x12",
-            "12x12"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -583,47 +143,7 @@
       "files": [
         {
           "path": "Hitori/000.json",
-          "count": 18,
-          "sizes": [
-            "4x4",
-            "5x5",
-            "5x5",
-            "8x8",
-            "6x6",
-            "7x7",
-            "7x7",
-            "8x8",
-            "8x8",
-            "8x8",
-            "5x5",
-            "5x5",
-            "5x5",
-            "5x5",
-            "8x8",
-            "8x8",
-            "8x8",
-            "8x8"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -635,47 +155,7 @@
       "files": [
         {
           "path": "Nurikabe/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18",
-            "6x6",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -687,47 +167,7 @@
       "files": [
         {
           "path": "Kurotto/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -739,47 +179,7 @@
       "files": [
         {
           "path": "Kuromasu/000.json",
-          "count": 18,
-          "sizes": [
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "9x9",
-            "13x13",
-            "13x13",
-            "13x13",
-            "13x13",
-            "13x13",
-            "17x17",
-            "17x17",
-            "11x11"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -791,47 +191,7 @@
       "files": [
         {
           "path": "Norinori/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -843,47 +203,7 @@
       "files": [
         {
           "path": "Heyawake/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "6x6",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x10",
-            "13x20",
-            "12x20",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x10",
-            "10x10",
-            "10x18",
-            "15x20",
-            "10x18"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -895,47 +215,7 @@
       "files": [
         {
           "path": "Chocona/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x18"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -947,47 +227,7 @@
       "files": [
         {
           "path": "LITS/000.json",
-          "count": 18,
-          "sizes": [
-            "6x7",
-            "6x9",
-            "9x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "11x11",
-            "13x13",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -999,47 +239,7 @@
       "files": [
         {
           "path": "Starbattle/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "6x6",
-            "7x7",
-            "12x12",
-            "10x10",
-            "10x10",
-            "11x11",
-            "9x9",
-            "10x10",
-            "10x10",
-            "10x10",
-            "9x9",
-            "11x11",
-            "14x14",
-            "10x10",
-            "12x12",
-            "9x9",
-            "5x5"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1051,47 +251,7 @@
       "files": [
         {
           "path": "Minesweeper/000.json",
-          "count": 18,
-          "sizes": [
-            "4x4",
-            "4x4",
-            "5x5",
-            "5x5",
-            "5x5",
-            "5x5",
-            "5x5",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "7x7",
-            "7x7",
-            "7x7",
-            "7x7",
-            "7x7",
-            "8x8"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1103,47 +263,7 @@
       "files": [
         {
           "path": "Akari/000.json",
-          "count": 18,
-          "sizes": [
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1155,47 +275,7 @@
       "files": [
         {
           "path": "Shimaguni/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "8x8",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1207,47 +287,7 @@
       "files": [
         {
           "path": "Mosaic/000.json",
-          "count": 18,
-          "sizes": [
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15",
-            "15x15"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1259,47 +299,7 @@
       "files": [
         {
           "path": "Nonogram/000.json",
-          "count": 18,
-          "sizes": [
-            "20x20",
-            "20x20",
-            "20x20",
-            "20x20",
-            "20x20",
-            "20x20",
-            "15x15",
-            "15x15",
-            "15x15",
-            "10x10",
-            "20x20",
-            "20x20",
-            "20x20",
-            "15x15",
-            "15x15",
-            "20x20",
-            "15x15",
-            "20x20"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1311,47 +311,7 @@
       "files": [
         {
           "path": "Masyu/000.json",
-          "count": 18,
-          "sizes": [
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "6x6",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x10",
-            "10x18",
-            "10x18",
-            "10x18",
-            "10x18",
-            "6x6"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     },
@@ -1363,47 +323,7 @@
       "files": [
         {
           "path": "Slitherlink/000.json",
-          "count": 18,
-          "sizes": [
-            "17x17",
-            "10x18",
-            "10x18",
-            "10x10",
-            "10x18",
-            "12x16",
-            "10x18",
-            "10x10",
-            "16x19",
-            "16x19",
-            "10x14",
-            "10x10",
-            "10x10",
-            "10x10",
-            "4x4",
-            "10x19",
-            "15x20",
-            "10x10"
-          ],
-          "ready": [
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
-          ]
+          "count": 18
         }
       ]
     }

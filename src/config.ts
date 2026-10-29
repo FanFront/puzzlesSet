@@ -31,3 +31,12 @@ export const GENRES: Genre[] = [
   {name:"Slitherlink",title:"Slitherlink",mode:"slitherlink",symbol:"⬡",description:"Draw a single loop"}
 ];
 export const GENRE_MAP = new Map(GENRES.map(g=>[g.name,g]));
+
+/** Unknown upstream genres remain in the library. Their controls are detected
+ * from each stored answer, not hardcoded or guessed from the puzzle name. */
+export function genreFor(name:string): Genre {
+  return GENRE_MAP.get(name) || {
+    name, title:name, mode:"symbols", symbol:"🧩",
+    description:"Grid-based logic puzzle", adaptive:true
+  };
+}

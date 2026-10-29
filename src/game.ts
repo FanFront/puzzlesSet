@@ -5,7 +5,17 @@ const lines = (text: string) => text.trim().split(/\r?\n/).map(s=>s.trim().split
 const padded = (line: string[] | undefined, columns: number) =>
   Array.from({length: columns},(_,i)=>line?.[i] || "-");
 
+/** Reject missing or non-rectangular stored answers before offering Check. */
+export function hasCheckableAnswer(record:PuzzleRecord):boolean {
+  if(!record.solution?.trim())return false;
+  const problem=lines(record.problem),answer=lines(record.solution);
+  const rows=Number(problem[0]?.[0]),cols=Number(problem[0]?.[1]);
+  if(!Number.isInteger(rows)||!Number.isInteger(cols)||rows<1||cols<1||rows>120||cols>120)return false;
+  if(Number(answer[0]?.[0])!==rows||Number(answer[0]?.[1])!==cols)return false;
+  return answer.length>=rows+1 && answer.slice(1,rows+1).every(row=>row.length===cols);
+}
 export function parsePuzzle(record: PuzzleRecord, genre: Genre): ParsedPuzzle {
+  if(!hasCheckableAnswer(record))throw new Error("No complete rectangular answer");
   const problem = lines(record.problem), solution = lines(record.solution);
   const rows = Number(problem[0]?.[0]), cols = Number(problem[0]?.[1]);
   if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows < 1 || cols < 1 || rows > 120 || cols > 120)
@@ -28,6 +38,31 @@ export function parsePuzzle(record: PuzzleRecord, genre: Genre): ParsedPuzzle {
     : undefined;
   return {rows,cols,clues,answer,regions};
 }
+/** Parse the dimensions in an original upstream key, e.g. 20_12x12.
+ * No separate size/classification index is generated during import or CI. */
+export function gridSizeFromRecord(record:PuzzleRecord):string {
+  const match=record.id.match(/(?:^|_)(\d+)x(\d+)(?:_|$)/i);
+  if(match)return Number(match[1])+"x"+Number(match[2]);
+  const header=record.problem.trim().split(/\s+/,2);
+  return header.length===2&&header.every(v=>/^\d+$/.test(v))?header[0]+"x"+header[1]:"";
+}
+/** Select controls from the actual answer encoding for unlisted puzzle types. */
+export function adaptGenre(record:PuzzleRecord,genre:Genre):Genre {
+  if(!genre.adaptive)return genre;
+  const answer=lines(record.solution);
+  const rows=Number(answer[0]?.[0]),cols=Number(answer[0]?.[1]);
+  const tokens=answer.slice(1,1+rows).flat().filter(v=>v!=="-");
+  if(!tokens.length||!Number.isInteger(rows)||!Number.isInteger(cols))return genre;
+  let mode:Genre["mode"]="symbols";
+  if(tokens.every(v=>v==="x"))mode="shade";
+  else if(tokens.includes("x") && tokens.some(v=>/^[nsew]+$/.test(v))
+          && tokens.every(v=>v==="x"||/^[nsew]+$/.test(v)))mode="mixed";
+  else if(tokens.every(v=>v==="b"||v==="w"))mode="binary";
+  else if(!["Shakashaka","Battleship","DigitalBattleship"].includes(genre.name)
+          &&tokens.every(v=>/^[nsew]+$/.test(v)))mode="masyu";
+  else if(tokens.every(v=>/^\d+$/.test(v)))mode="number";
+  return {...genre,mode};
+}
 export function cellKey(r:number,c:number): string {return String(r)+","+String(c);}
 export function cellEdge(r:number,c:number,s:number,d:number): string {
   const a=cellKey(r,c), b=cellKey(s,d);
@@ -39,7 +74,7 @@ export function vertexEdge(r:number,c:number,s:number,d:number): string {
 }
 export function allEdges(p:ParsedPuzzle, genre:Genre): string[] {
   const list:string[]=[];
-  if(genre.mode==="masyu"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")){
     for(let r=0;r<p.rows;r++) for(let c=0;c<p.cols;c++){
       if(c+1<p.cols) list.push(cellEdge(r,c,r,c+1));
       if(r+1<p.rows) list.push(cellEdge(r,c,r+1,c));
@@ -54,7 +89,7 @@ export function allEdges(p:ParsedPuzzle, genre:Genre): string[] {
 }
 export function solutionEdges(p:ParsedPuzzle,genre:Genre): Set<string> {
   const edges=new Set<string>();
-  if(genre.mode==="masyu"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")){
     for(let r=0;r<p.rows;r++) for(let c=0;c<p.cols;c++){
       const value=p.answer[r][c].toLowerCase();
       if(value.includes("e") && c+1<p.cols)edges.add(cellEdge(r,c,r,c+1));
@@ -72,8 +107,19 @@ export function solutionEdges(p:ParsedPuzzle,genre:Genre): Set<string> {
   return edges;
 }
 export function isLocked(p:ParsedPuzzle,genre:Genre,r:number,c:number):boolean {
+  const clue=p.clues[r][c];
+  if(genre.name==="Hitori"||genre.name==="Mosaic")return false;
+  if(genre.adaptive){
+    if(clue==="-"||clue==="."||clue==="?")return false;
+    if(genre.mode==="mixed")return true;
+    if(genre.mode==="shade")return clue==="x"||clue==="o";
+    if(genre.mode==="masyu"||genre.mode==="slitherlink")return false;
+    // Numeric givens match the answer; other tokens are constraint labels,
+    // displayed separately instead of accidentally blocking player input.
+    return clue===p.answer[r][c];
+  }
   return !genre.clueOnly && !genre.regionOnly && genre.mode!=="nonogram" &&
-    genre.mode!=="masyu" && genre.mode!=="slitherlink" && p.clues[r][c]!=="-";
+    genre.mode!=="masyu" && genre.mode!=="slitherlink" && clue!=="-";
 }
 export function isMarked(solutionToken:string,genre:Genre):boolean {
   if(genre.name==="LITS")return ["L","I","T","S","x"].includes(solutionToken);
@@ -83,12 +129,23 @@ export function isMarked(solutionToken:string,genre:Genre):boolean {
 /** Only player-entered answers are sent to the checker. Clues, blanks, and notes are excluded. */
 export function answerVectors(p:ParsedPuzzle,genre:Genre,s:Snapshot): {expected:string[];actual:string[];complete:boolean} {
   const expected:string[]=[],actual:string[]=[];
-  if(genre.mode==="masyu"||genre.mode==="slitherlink"){
+  if((genre.mode==="masyu"||genre.mode==="mixed")||genre.mode==="slitherlink"){
     const keys=new Set(allEdges(p,genre));
     const wanted=solutionEdges(p,genre);
     const entered=new Set(s.edges.filter(key=>keys.has(key)));
     for(const key of entered){expected.push(wanted.has(key)?"1":"0");actual.push("1");}
-    const complete=entered.size===wanted.size&&[...wanted].every(key=>entered.has(key));
+    let complete=entered.size===wanted.size&&[...wanted].every(key=>entered.has(key));
+    if(genre.mode==="mixed"){
+      for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){
+        if(isLocked(p,genre,r,c))continue;
+        const mark=s.marks[cellKey(r,c)];
+        if(p.answer[r][c]==="x"&&mark!=="x")complete=false;
+        if(mark==="x"||mark==="w"){
+          expected.push(p.answer[r][c]==="x"?"1":"0");
+          actual.push(mark==="x"?"1":"0");
+        }
+      }
+    }
     return {expected,actual,complete};
   }
   let complete=true;

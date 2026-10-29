@@ -1,39 +1,38 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, CircleHelp, Eraser, Grid3X3, Layers, Pencil, Play, Redo2, RotateCcw, Search, Sparkles, Undo2, X } from "lucide-react";
 import { Board } from "./Board";
-import { GENRES, GENRE_MAP } from "./config";
+import { genreFor } from "./config";
 import { localizedDescription, localizedRules, localizedTitle } from "./rules";
-import { answerVectors, blankSnapshot, cellKey, checkPuzzle, isLocked, parsePuzzle, readSaved, writeSaved } from "./game";
+import { adaptGenre, answerVectors, blankSnapshot, cellKey, checkPuzzle, gridSizeFromRecord, hasCheckableAnswer, isLocked, parsePuzzle, readSaved, writeSaved } from "./game";
 import type { Catalog, CatalogType, Genre, Language, ParsedPuzzle, PuzzleRecord, Snapshot } from "./types";
 
 type Active = { genre: Genre; record: PuzzleRecord; parsed: ParsedPuzzle; level: number };
 type Screen = "library" | "levels" | "game";
 const PAGE_SIZE = 36;
-const smallEnough = (p: ParsedPuzzle) => p.rows <= 20 && p.cols <= 20;
 const dictionary = {
   zh: {
-    offline:"离线畅玩", heroTag:"一座随身携带的解谜乐园", heroTitle:"今天，来解一道题。", heroText:"27 种逻辑谜题 · 自由选关 · 自动保存进度。跟随自己的节奏，享受推理的乐趣。",
+    offline:"离线畅玩", heroTag:"一座随身携带的解谜乐园", heroTitle:"今天，来解一道题。", heroText:"探索多种逻辑谜题 · 自由选关 · 自动保存进度。跟随自己的节奏，享受推理的乐趣。",
     count:"收录谜题", types:"可玩类型", private:"无需联网", library:"游戏大厅", choose:"挑选喜欢的玩法", search:"搜索游戏类型…", all:"全部", number:"数字", shade:"涂色", binary:"黑白", loop:"画线",
     available:"关可选", solved:"已完成", levelTitle:"选择关卡", selectPrompt:"选择一个关卡开始解谜。你的进度会保存在本机。", level:"第", levelSuffix:"关", board:"游戏棋盘",
     howTo:"玩法说明", rulesTitle:"游戏规则", gotIt:"开始玩", next:"下一关", previous:"上一关", back:"返回", play:"进入关卡",
     undo:"撤销", redo:"重做", multi:"多选", notes:"笔记", reset:"重置", clear:"清除", fill:"涂黑", empty:"标空", star:"星星", bulb:"灯泡", black:"黑", white:"白",
     markEmpty:"留空", enter:"输入", numberPlaceholder:"输入数字", check:"检查填写", help:"规则", pause:"保存中", saved:"进度自动保存在此设备", given:"初始提示", yours:"你的填写", legends:"棋盘图例",
-    notYet:"还没有填写内容。先试试吧！", wrong:"有填写错误，请再检查一下。", good:"目前填写的内容没有错误，继续加油！", won:"恭喜完成本关！🎉", failed:"无法打开该关卡，请选择另一关。", notPlayable:"这道谜题未提供完整答案，或尺寸超过 20×20，当前版本暂不支持。",
+    notYet:"还没有填写内容。先试试吧！", wrong:"有填写错误，请再检查一下。", good:"目前填写的内容没有错误，继续加油！", won:"恭喜完成本关！🎉", failed:"无法打开该关卡，请选择另一关。", notPlayable:"这道谜题没有可检查的完整答案，当前暂不可玩。",
     resetConfirm:"确定要清空这一关的所有填写吗？", noData:"未找到离线题库，请先导入谜题数据。", noMatch:"没有匹配的游戏类型。", load:"正在打开关卡…",
     levelHint:"按编号选关，绝不随机跳转", sizeAll:"全部尺寸", sizeTitle:"棋盘尺寸", filtered:"符合条件的关卡", unavailable:"暂不可玩", more:"查看更多关卡", backLevels:"返回选关", tipNumber:"点击选中格子，再使用数字键盘。笔记模式可添加角标候选数；多选支持拖动选择。", tipShade:"点击格子可快速涂黑，或使用下方按钮标记白格。初始线索无法修改。", tipLoop:"沿线条滑动绘制闭环；可用撤销与重做修改路径。", tipBinary:"点选方格后填写黑或白；初始圆点不可更改。",
-    loadError:"无法加载题库", levelsEmpty:"此类型暂无可用关卡。"
+    loadError:"无法加载题库", levelsEmpty:"此类型暂无可用关卡。", rulesFallback:"此玩法尚无已核实的详细规则说明。请参考原题来源；可以使用棋盘进行填写和检查。", source:"原题来源"
   },
   en: {
-    offline:"PLAY OFFLINE",heroTag:"YOUR POCKET PUZZLE ARCADE",heroTitle:"A little logic. A lot of fun.",heroText:"27 puzzle styles · choose your level · progress saved automatically. Play at your own pace.",
+    offline:"PLAY OFFLINE",heroTag:"YOUR POCKET PUZZLE ARCADE",heroTitle:"A little logic. A lot of fun.",heroText:"Many puzzle styles · choose your level · progress saved automatically. Play at your own pace.",
     count:"puzzles",types:"playable games",private:"offline",library:"GAME LIBRARY",choose:"Choose your next challenge",search:"Search puzzle types…",all:"All",number:"Numbers",shade:"Shading",binary:"Binary",loop:"Loops",
     available:"levels",solved:"completed",levelTitle:"Choose a level",selectPrompt:"Pick any numbered level. Your progress stays on this device.",level:"Level ",levelSuffix:"",board:"Puzzle board",
     howTo:"How to play",rulesTitle:"How to play",gotIt:"Let's play",next:"Next level",previous:"Previous level",back:"Back",play:"Play level",
     undo:"Undo",redo:"Redo",multi:"Multi",notes:"Notes",reset:"Reset",clear:"Erase",fill:"Fill",empty:"Mark empty",star:"Star",bulb:"Bulb",black:"Black",white:"White",
     markEmpty:"Empty",enter:"Enter",numberPlaceholder:"Number",check:"Check entries",help:"Rules",pause:"Saving",saved:"Progress is saved automatically on this device",given:"Given clue",yours:"Your entry",legends:"Board key",
-    notYet:"Nothing entered yet. Give it a try!",wrong:"Some of your entries are incorrect. Have another look.",good:"No mistakes in your entries so far. Keep going!",won:"Puzzle completed! 🎉",failed:"Unable to open this level. Please choose another.",notPlayable:"This level has no complete solution or exceeds 20×20, so it is not supported yet.",
+    notYet:"Nothing entered yet. Give it a try!",wrong:"Some of your entries are incorrect. Have another look.",good:"No mistakes in your entries so far. Keep going!",won:"Puzzle completed! 🎉",failed:"Unable to open this level. Please choose another.",notPlayable:"This level has no checkable solution, so it is not playable yet.",
     resetConfirm:"Clear all of your entries for this level?",noData:"Offline puzzle data was not found. Import the data before running the app.",noMatch:"No matching games found.",load:"Opening level…",
     levelHint:"Choose by number — never random",sizeAll:"All sizes",sizeTitle:"Grid size",filtered:"matching levels",unavailable:"Not playable yet",more:"Browse more levels",backLevels:"All levels",tipNumber:"Tap to select cells, then use the number pad. Notes are small candidates; Multi supports drag selection.",tipShade:"Tap to fill quickly, or mark cells as empty using the controls. Initial clues are fixed.",tipLoop:"Drag to draw a loop. Undo and redo edit your paths.",tipBinary:"Select a cell, then choose black or white. Initial circles cannot be changed.",
-    loadError:"Unable to load library",levelsEmpty:"No levels available in this category."
+    loadError:"Unable to load library",levelsEmpty:"No levels available in this category.",rulesFallback:"Verified rules for this variant are not documented yet. Consult the original puzzle source; you can still enter and check answers on the board.",source:"Original puzzle"
   }
 } as const;
 
@@ -54,9 +53,9 @@ function totalLevels(entry: CatalogType | undefined): number {
   return entry?.files.reduce((sum,file)=>sum+file.count,0)||0;
 }
 function gameFamily(g: Genre): "number"|"shade"|"binary"|"loop" {
-  if(g.mode==="number")return "number";
+  if(g.mode==="number"||g.mode==="symbols")return "number";
   if(g.mode==="binary")return "binary";
-  if(g.mode==="masyu"||g.mode==="slitherlink")return "loop";
+  if(g.mode==="masyu"||g.mode==="slitherlink"||g.mode==="mixed")return "loop";
   return "shade";
 }
 function App() {
@@ -71,6 +70,8 @@ function App() {
   const [chosen,setChosen]=useState<Genre|null>(null);
   const [page,setPage]=useState(0);
   const [sizeFilter,setSizeFilter]=useState("all");
+  const [indexedLevels,setIndexedLevels]=useState<{index:number;id:string;size:string;ready:boolean}[]>([]);
+  const [indexing,setIndexing]=useState(false);
   const [active,setActive]=useState<Active|null>(null);
   const [snapshot,setSnapshot]=useState<Snapshot>(blankSnapshot());
   const [selection,setSelection]=useState<number[]>([]);
@@ -129,6 +130,41 @@ function App() {
       return next;
     });
   },[]);
+  // Read original IDs only when a series is chosen. The dataset and CI
+  // never create an extra size-classification file.
+  useEffect(()=>{
+    if(!chosen||!catalog)return;
+    const entry=catalog.types.find(v=>v.name===chosen.name);
+    let cancelled=false;
+    setIndexedLevels([]);
+    setIndexing(true);
+    (async()=>{
+      const result:{index:number;id:string;size:string;ready:boolean}[]=[];
+      let offset=0;
+      for(const file of entry?.files||[]){
+        if(cancelled)return;
+        let records=cache.current.get(file.path);
+        if(!records){
+          const response=await fetch("/puzzles/"+file.path);
+          if(!response.ok)throw Error("Failed to load "+file.path);
+          const payload=await response.json();
+          if(!Array.isArray(payload.puzzles))throw Error("Malformed puzzle shard");
+          records=payload.puzzles as PuzzleRecord[];
+          cache.current.set(file.path,records);
+        }
+        for(let i=0;i<file.count;i++){
+          const record=records[i];
+          result.push({index:offset+i,id:record?.id||String(offset+i+1),
+            size:record?gridSizeFromRecord(record):"",ready:!!record&&hasCheckableAnswer(record)});
+        }
+        offset+=file.count;
+      }
+      if(!cancelled)setIndexedLevels(result);
+    })().catch(e=>{if(!cancelled)setMessage(e instanceof Error?e.message:String(e));})
+      .finally(()=>{if(!cancelled)setIndexing(false);});
+    return ()=>{cancelled=true;};
+  },[chosen?.name,catalog]);
+
   const openLevels=(genre:Genre)=>{
     request.current++;checkVersion.current++;
     if(chosen?.name!==genre.name){setSizeFilter("all");setPage(0);}
@@ -160,11 +196,11 @@ function App() {
         cache.current.set(file.path,records);
       }
       const record=records[offset];
-      if(!record?.solution?.trim())throw Error(t.notPlayable);
-      const parsed=parsePuzzle(record,genre);
-      if(!smallEnough(parsed))throw Error(t.notPlayable);
+      if(!record||!hasCheckableAnswer(record))throw Error(t.notPlayable);
+      const playableGenre=adaptGenre(record,genre);
+      const parsed=parsePuzzle(record,playableGenre);
       if(mine!==request.current)return;
-      setActive({genre,record,parsed,level});
+      setActive({genre:playableGenre,record,parsed,level});
       setChosen(genre);
       setSnapshot(readSaved(genre.name,record.id));
       timeline.current={past:[],future:[]};
@@ -260,24 +296,15 @@ function App() {
     document.addEventListener("keydown",handler);
     return ()=>document.removeEventListener("keydown",handler);
   },[active,selection,pencil,undo,redo,rulesOpen,screen]);
-  const genres=GENRES.filter(g=>{
+  const genres=(catalog?.types||[]).filter(entry=>entry.solved>0).map(entry=>genreFor(entry.name)).filter(g=>{
     const entry=catalog?.types.find(v=>v.name===g.name);
     const words=(g.title+" "+g.description+" "+localizedTitle(g.name,language)+" "+localizedDescription(g.name,g.description,language)).toLowerCase();
     return words.includes(search.trim().toLowerCase())&&(filter==="all"||filter===gameFamily(g))&&!!entry?.solved;
   });
-  const sums={types:catalog?.types.filter(v=>GENRE_MAP.has(v.name)&&v.solved>0).length||0,puzzles:catalog?.types.reduce((n,v)=>n+v.count,0)||0};
+  const sums={types:catalog?.types.filter(v=>v.solved>0).length||0,puzzles:catalog?.types.reduce((n,v)=>n+v.count,0)||0};
   const entry=chosen&&catalog?.types.find(v=>v.name===chosen.name);
   const levelCount=totalLevels(entry||undefined);
-  // Per-level metadata is built into the offline catalog at import time.
-  // The original level number is stable even after the size filter is applied.
-  const indexedLevels=useMemo(() => {
-    const levels: {index:number;size:string;ready:boolean}[]=[];
-    if(entry){let index=0;for(const file of entry.files){
-      for(let i=0;i<file.count;i++)levels.push({index:index+i,size:file.sizes?.[i]||"",ready:file.ready?.[i]??true});
-      index+=file.count;
-    }}
-    return levels;
-  },[entry]);
+  // Original order remains stable even when filtering by original ID size.
   const sizes=useMemo(() => [...new Set(indexedLevels.map(item=>item.size).filter(Boolean))]
     .sort((a,b)=>{const [ar,ac]=a.split("x").map(Number),[br,bc]=b.split("x").map(Number);return ar*ac-br*bc||ar-br||ac-bc;}),[indexedLevels]);
   const filteredLevels=useMemo(() => sizeFilter==="all"?indexedLevels:indexedLevels.filter(level=>level.size===sizeFilter),[indexedLevels,sizeFilter]);
@@ -288,7 +315,13 @@ function App() {
   },[indexedLevels]);
   const pageCount=Math.max(1,Math.ceil(filteredLevels.length/PAGE_SIZE));
   const ruleGenre=active?.genre||chosen;
-  const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink";
+  const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink"||active?.genre.mode==="mixed";
+  const symbols=useMemo(()=>{
+    if(!active||active.genre.mode!=="symbols")return [];
+    return [...new Set(active.parsed.answer.flat().filter(v=>v!=="-"&&v!==""))]
+      .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).slice(0,18);
+  },[active]);
+  const canMarkEmpty=!!active?.parsed.answer.some(row=>row.includes("-"));
   const filled=active?Object.keys(snapshot.marks).filter(key=>snapshot.marks[key]!=="-").length:0;
   const allowed=active?active.parsed.rows*active.parsed.cols-Array.from({length:active.parsed.rows*active.parsed.cols},(_,i)=>i).filter(i=>isLocked(active.parsed,active.genre,Math.floor(i/active.parsed.cols),i%active.parsed.cols)).length:0;
   const levelLabel=(n:number)=>t.level+n+t.levelSuffix;
@@ -352,15 +385,15 @@ function App() {
       <div className="level-title-row"><h2>{t.levelTitle} · {filteredLevels.length} {t.filtered}</h2><small>{t.levelHint}</small></div>
       <div className="level-grid">{filteredLevels.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE).map(level=>{
         const n=level.index+1,won=!!done[chosen.name+":"+level.index];
-        return <button key={n} className={"level-tile "+(won?"level-done":"")} onClick={()=>loadLevel(chosen,level.index)} disabled={loading||!level.ready}
-          title={!level.ready?t.unavailable:level.size.replace("x","×")} aria-label={levelLabel(n)+(level.size?" "+level.size.replace("x","×"):"")}>
-          <strong>{String(n).padStart(2,"0")}</strong>{won&&<CheckCircle2 size={16}/>}
+        return <button key={n} className={"level-tile "+(won?"level-done":"")} onClick={()=>loadLevel(chosen,level.index)} disabled={loading||indexing||!level.ready}
+          title={!level.ready?t.unavailable:level.id} aria-label={levelLabel(n)+(level.size?" "+level.size.replace("x","×"):"")}>
+          <strong>{String(n).padStart(2,"0")}</strong><small className="level-id">{level.id}</small>{won&&<CheckCircle2 size={16}/>}
         </button>;
       })}</div>
-      {levelCount===0&&<div className="empty-state">{t.levelsEmpty}</div>}
-      {loading&&<div className="notice">{t.load}</div>}
+      {!indexing&&filteredLevels.length===0&&<div className="empty-state">{t.levelsEmpty}</div>}
+      {(loading||indexing)&&<div className="notice">{t.load}</div>}
       {message&&<div className="notice" role="status">{message}</div>}
-      {pageCount>1&&<div className="pagination"><button disabled={page===0||loading} onClick={()=>setPage(p=>p-1)}><ChevronLeft size={19}/>{t.previous}</button><span>{page+1} / {pageCount}</span><button disabled={page===pageCount-1||loading} onClick={()=>setPage(p=>p+1)}>{t.next}<ChevronRight size={19}/></button></div>}
+      {pageCount>1&&<div className="pagination"><button disabled={page===0||loading||indexing} onClick={()=>setPage(p=>p-1)}><ChevronLeft size={19}/>{t.previous}</button><span>{page+1} / {pageCount}</span><button disabled={page===pageCount-1||loading||indexing} onClick={()=>setPage(p=>p+1)}>{t.next}<ChevronRight size={19}/></button></div>}
     </main>}
 
     {screen==="game"&&active&&<main className="playing">
@@ -372,6 +405,7 @@ function App() {
       <div className="puzzle-stage">
         <div className="stage-top"><span><span className="stage-dot"/> {t.board}</span><span>{isLoop?snapshot.edges.length:filled+" / "+allowed}</span></div>
         <div className="board-area"><Board parsed={active.parsed} genre={active.genre} state={snapshot} selected={selection} multi={multi} onSelect={selectCell} onTap={tap} onEdge={edgeAction} label={keyTitle(active.genre)}/></div>
+        {active.genre.adaptive&&<details className="original-clues"><summary>{language==="zh"?"原始题面与额外线索":"Original notation and additional clues"}</summary><pre>{active.record.problem}</pre>{active.record.info&&<p>{active.record.info}</p>}</details>}
         <div className="board-legend" aria-label={t.legends}><span><i className="legend-given"/> {t.given}</span><span><i className="legend-player"/> {t.yours}</span></div>
       </div>
       <div className="game-controls">
@@ -385,11 +419,17 @@ function App() {
         {active.genre.mode==="number"&&<div className="keypad">
           <div className="numbers">{Array.from({length:Math.min(9,Math.max(active.parsed.rows,active.parsed.cols))},(_,i)=>i+1).map(n=><button className="key" key={n} onClick={()=>enter(String(n))}>{n}</button>)}</div>
           <div className="keypad-bottom"><div className="wide-entry"><input inputMode="numeric" aria-label={t.numberPlaceholder} placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&/^\d+$/.test(inputValue)){enter(inputValue);setInputValue("");}}}/><button onClick={()=>{if(/^\d+$/.test(inputValue)){enter(inputValue);setInputValue("");}}}>{t.enter}</button></div>
-          {active.genre.name==="Fuzuli"&&<button className="erase" onClick={()=>enter("~")}>{t.markEmpty}</button>}
+          {(active.genre.name==="Fuzuli"||active.genre.adaptive&&canMarkEmpty)&&<button className="erase" onClick={()=>enter("~")}>{t.markEmpty}</button>}
+          <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>
+        </div>}
+        {active.genre.mode==="symbols"&&<div className="keypad">
+          <div className="numbers">{symbols.map(v=><button className="key" key={v} onClick={()=>enter(v)}>{v}</button>)}</div>
+          <div className="keypad-bottom"><div className="wide-entry"><input aria-label={t.numberPlaceholder} placeholder={t.numberPlaceholder} value={inputValue} onChange={e=>setInputValue(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&inputValue.trim()){enter(inputValue.trim());setInputValue("");}}}/><button onClick={()=>{if(inputValue.trim()){enter(inputValue.trim());setInputValue("");}}}>{t.enter}</button></div>
+          {canMarkEmpty&&<button className="erase" onClick={()=>enter("~")}>{t.markEmpty}</button>}
           <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>
         </div>}
         {active.genre.mode==="binary"&&<div className="choice-row"><button onClick={()=>enter("b")}><span className="choice-dot dark"/> {t.black}</button><button onClick={()=>enter("w")}><span className="choice-dot light"/> {t.white}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
-        {(active.genre.mode==="shade"||active.genre.mode==="nonogram")&&<div className="choice-row"><button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button><button onClick={()=>enter("w")}>□ {t.empty}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
+        {(active.genre.mode==="shade"||active.genre.mode==="nonogram"||active.genre.mode==="mixed")&&<div className="choice-row"><button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button><button onClick={()=>enter("w")}>□ {t.empty}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
         <p className="control-tip">{isLoop?t.tipLoop:active.genre.mode==="number"?t.tipNumber:active.genre.mode==="binary"?t.tipBinary:t.tipShade}</p>
         {message&&<div role="status" className={"result "+resultKind}>{message}</div>}
         <div className="play-actions"><button className="check-button" onClick={check}><CheckCircle2 size={21}/>{t.check}</button><button className="secondary-button" onClick={()=>setRulesOpen(true)}><CircleHelp size={19}/>{t.help}</button></div>
@@ -402,7 +442,11 @@ function App() {
       <section className="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rules-heading">
         <div className="dialog-title"><span className="dialog-icon">{ruleGenre.symbol}</span><div><small>{t.rulesTitle}</small><h2 id="rules-heading">{keyTitle(ruleGenre)}</h2></div><button className="close-modal" onClick={()=>setRulesOpen(false)} aria-label="Close rules"><X size={22}/></button></div>
         <p className="rule-intro">{localizedDescription(ruleGenre.name,ruleGenre.description,language)}</p>
-        <ol className="rule-list">{localizedRules(ruleGenre.name,language).map((rule,i)=><li key={i}>{rule}</li>)}</ol>
+        {localizedRules(ruleGenre.name,language).length>0
+          ?<ol className="rule-list">{localizedRules(ruleGenre.name,language).map((rule,i)=><li key={i}>{rule}</li>)}</ol>
+          :<p className="rule-intro">{t.rulesFallback}</p>}
+        {active?.genre.name===ruleGenre.name&&/^https?:\/\//.test(active.record.source||"")&&
+          <p className="rule-intro"><a href={active.record.source} target="_blank" rel="noopener noreferrer">{t.source}</a></p>}
         <button className="check-button modal-cta" onClick={()=>setRulesOpen(false)}><Play size={19}/>{t.gotIt}</button>
       </section>
     </div>}

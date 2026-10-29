@@ -24,12 +24,37 @@ class ImporterTests(unittest.TestCase):
                 catalog = importer.import_data(upstream)
                 self.assertEqual(catalog["types"][0]["count"], 2)
                 self.assertEqual(catalog["types"][0]["solved"], 1)
-                self.assertEqual(catalog["types"][0]["files"][0]["sizes"], ["2x2", "2x2"])
-                self.assertEqual(catalog["types"][0]["files"][0]["ready"], [True, False])
+                self.assertEqual(catalog["types"][0]["files"][0], {"path": "Sudoku/000.json", "count": 2})
                 self.assertTrue(catalog["types"][0]["playable"])
                 game = json.loads((root / "output" / "Sudoku" / "000.json").read_text())
                 self.assertEqual(len(game["puzzles"]), 2)
+                self.assertEqual(game["puzzles"][0]["id"], "01_2x2")
                 self.assertEqual(game["puzzles"][0]["solution"], "2 2\n1 2\n2 1")
+
+    def test_all_families_imported_without_generated_grid_metadata(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            upstream = root / "assets" / "data"
+            for name in ("Sudoku", "Aqre"):
+                directory = upstream / name
+                directory.mkdir(parents=True)
+                (directory / f"{name}_dataset_000.json").write_text(json.dumps({
+                    "data": {
+                        "20_12x12": {
+                            "problem": "2 2\n- -\n- -",
+                            "solution": "2 2\nx -\n- x",
+                        }
+                    }
+                }))
+            with patch.object(importer, "OUT", root / "output"):
+                catalog = importer.import_data(upstream)
+                self.assertEqual({x["name"] for x in catalog["types"]}, {"Aqre", "Sudoku"})
+                for puzzle_type in catalog["types"]:
+                    self.assertEqual(puzzle_type["files"][0]["count"], 1)
+                    self.assertNotIn("sizes", puzzle_type["files"][0])
+                    self.assertNotIn("ready", puzzle_type["files"][0])
+                    shard = json.loads((root / "output" / puzzle_type["name"] / "000.json").read_text())
+                    self.assertEqual(shard["puzzles"][0]["id"], "20_12x12")
 
     def test_rejects_invalid_puzzle(self):
         self.assertIsNone(importer.normalize_case("bad", {"problem": "abc", "solution": ""}))

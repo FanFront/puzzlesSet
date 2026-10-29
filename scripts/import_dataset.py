@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Import PuzzleKit's JSON shards as lazy-loaded, offline app assets.
 
-All genres are mirrored with --all; the UI only advertises genres with controls.
+Every genre is mirrored; the UI adapts controls to solved answer formats.
 No runtime GitHub/network dependency: APK includes the imported JSON files.
 """
 import argparse
@@ -15,15 +15,6 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "puzzles"
-PLAYABLE = {
-    "Sudoku", "Hidoku", "Hakyuu", "Suguru", "JigsawSudoku", "KenKen",
-    "KillerSudoku", "Cojun", "Fuzuli", "Binairo", "YinYang", "Hitori",
-    "Nurikabe", "Kurotto", "Kuromasu", "Norinori", "Heyawake", "Chocona",
-    "LITS", "Starbattle", "Minesweeper", "Akari", "Shimaguni", "Mosaic",
-    "Nonogram", "Masyu", "Slitherlink",
-}
-
-
 def normalize_case(case_id, raw):
     if not isinstance(raw, dict):
         return None
@@ -64,7 +55,7 @@ def import_data(source: Path, all_types=False, limit=0):
         "types": [],
     }
     for folder in sorted(source.iterdir()):
-        if not folder.is_dir() or (not all_types and folder.name not in PLAYABLE):
+        if not folder.is_dir():
             continue
         files = sorted(folder.glob("*_dataset_*.json"))
         if not files:
@@ -85,11 +76,6 @@ def import_data(source: Path, all_types=False, limit=0):
             output_files.append({
                 "path": folder.name + "/" + name,
                 "count": len(batch),
-                # Indexed once at import time; level selection never needs a remote lookup.
-                "sizes": ["{}x{}".format(*(int(x) for x in item["problem"].splitlines()[0].split()[:2])) for item in batch],
-                "ready": [bool(item["solution"].strip()) and
-                          max(int(x) for x in item["problem"].splitlines()[0].split()[:2]) <= 20
-                          and folder.name in PLAYABLE for item in batch],
             })
             batch.clear()
 
@@ -123,7 +109,7 @@ def import_data(source: Path, all_types=False, limit=0):
             continue
         catalog["types"].append({
             "name": folder.name, "count": count, "solved": solved,
-            "playable": folder.name in PLAYABLE, "files": output_files
+            "playable": True, "files": output_files
         })
         print(f"{folder.name}: {count} puzzles ({solved} with solutions)")
     (OUT / "catalog.json").write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -134,7 +120,7 @@ def import_data(source: Path, all_types=False, limit=0):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--source", type=Path, help="Local checkout's assets/data folder")
-    p.add_argument("--all", action="store_true", help="Mirror all types, even those without playable controls yet")
+    p.add_argument("--all", action="store_true", help="Deprecated compatibility option; all types are imported by default")
     p.add_argument("--limit-per-type", type=int, default=0, help="For small sample imports (0 means all)")
     args = p.parse_args()
     if args.source:
