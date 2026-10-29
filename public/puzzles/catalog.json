@@ -843,7 +843,47 @@
       "files": [
         {
           "path": "Heyawake/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "10x10",
+            "10x10",
+            "6x6",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x10",
+            "13x20",
+            "12x20",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x10",
+            "10x10",
+            "10x18",
+            "15x20",
+            "10x18"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -855,7 +895,47 @@
       "files": [
         {
           "path": "Chocona/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x6",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x18"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -867,7 +947,47 @@
       "files": [
         {
           "path": "LITS/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x7",
+            "6x9",
+            "9x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "11x11",
+            "13x13",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x10",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -879,7 +999,47 @@
       "files": [
         {
           "path": "Starbattle/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x6",
+            "6x6",
+            "7x7",
+            "12x12",
+            "10x10",
+            "10x10",
+            "11x11",
+            "9x9",
+            "10x10",
+            "10x10",
+            "10x10",
+            "9x9",
+            "11x11",
+            "14x14",
+            "10x10",
+            "12x12",
+            "9x9",
+            "5x5"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -891,7 +1051,47 @@
       "files": [
         {
           "path": "Minesweeper/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "4x4",
+            "4x4",
+            "5x5",
+            "5x5",
+            "5x5",
+            "5x5",
+            "5x5",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "6x6",
+            "7x7",
+            "7x7",
+            "7x7",
+            "7x7",
+            "7x7",
+            "8x8"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -903,7 +1103,47 @@
       "files": [
         {
           "path": "Akari/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x18",
+            "10x18",
+            "10x18",
+            "10x18"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -915,7 +1155,47 @@
       "files": [
         {
           "path": "Shimaguni/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "6x6",
+            "8x8",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10",
+            "10x10"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
@@ -927,7 +1207,47 @@
       "files": [
         {
           "path": "Mosaic/000.json",
-          "count": 18
+          "count": 18,
+          "sizes": [
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15",
+            "15x15"
+          ],
+          "ready": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ]
         }
       ]
     },
