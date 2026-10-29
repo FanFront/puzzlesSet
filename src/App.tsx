@@ -55,7 +55,7 @@ function totalLevels(entry: CatalogType | undefined): number {
 function gameFamily(g: Genre): "number"|"shade"|"binary"|"loop" {
   if(g.mode==="number"||g.mode==="symbols")return "number";
   if(g.mode==="binary")return "binary";
-  if(g.mode==="masyu"||g.mode==="slitherlink")return "loop";
+  if(g.mode==="masyu"||g.mode==="slitherlink"||g.mode==="mixed")return "loop";
   return "shade";
 }
 function App() {
@@ -315,7 +315,7 @@ function App() {
   },[indexedLevels]);
   const pageCount=Math.max(1,Math.ceil(filteredLevels.length/PAGE_SIZE));
   const ruleGenre=active?.genre||chosen;
-  const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink";
+  const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink"||active?.genre.mode==="mixed";
   const symbols=useMemo(()=>{
     if(!active||active.genre.mode!=="symbols")return [];
     return [...new Set(active.parsed.answer.flat().filter(v=>v!=="-"&&v!==""))]
@@ -405,6 +405,7 @@ function App() {
       <div className="puzzle-stage">
         <div className="stage-top"><span><span className="stage-dot"/> {t.board}</span><span>{isLoop?snapshot.edges.length:filled+" / "+allowed}</span></div>
         <div className="board-area"><Board parsed={active.parsed} genre={active.genre} state={snapshot} selected={selection} multi={multi} onSelect={selectCell} onTap={tap} onEdge={edgeAction} label={keyTitle(active.genre)}/></div>
+        {active.genre.adaptive&&<details className="original-clues"><summary>{language==="zh"?"原始题面与额外线索":"Original notation and additional clues"}</summary><pre>{active.record.problem}</pre>{active.record.info&&<p>{active.record.info}</p>}</details>}
         <div className="board-legend" aria-label={t.legends}><span><i className="legend-given"/> {t.given}</span><span><i className="legend-player"/> {t.yours}</span></div>
       </div>
       <div className="game-controls">
@@ -428,7 +429,7 @@ function App() {
           <button className="erase" onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>
         </div>}
         {active.genre.mode==="binary"&&<div className="choice-row"><button onClick={()=>enter("b")}><span className="choice-dot dark"/> {t.black}</button><button onClick={()=>enter("w")}><span className="choice-dot light"/> {t.white}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
-        {(active.genre.mode==="shade"||active.genre.mode==="nonogram")&&<div className="choice-row"><button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button><button onClick={()=>enter("w")}>□ {t.empty}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
+        {(active.genre.mode==="shade"||active.genre.mode==="nonogram"||active.genre.mode==="mixed")&&<div className="choice-row"><button onClick={()=>enter("x")}>{active.genre.name==="Starbattle"?"★":active.genre.name==="Akari"?"☀":"■"} {active.genre.name==="Starbattle"?t.star:active.genre.name==="Akari"?t.bulb:t.fill}</button><button onClick={()=>enter("w")}>□ {t.empty}</button><button onClick={()=>enter("-")}><Eraser size={17}/>{t.clear}</button></div>}
         <p className="control-tip">{isLoop?t.tipLoop:active.genre.mode==="number"?t.tipNumber:active.genre.mode==="binary"?t.tipBinary:t.tipShade}</p>
         {message&&<div role="status" className={"result "+resultKind}>{message}</div>}
         <div className="play-actions"><button className="check-button" onClick={check}><CheckCircle2 size={21}/>{t.check}</button><button className="secondary-button" onClick={()=>setRulesOpen(true)}><CircleHelp size={19}/>{t.help}</button></div>
