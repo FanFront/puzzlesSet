@@ -80,33 +80,41 @@ export function isMarked(solutionToken:string,genre:Genre):boolean {
   if(genre.name==="Akari")return solutionToken==="o";
   return solutionToken==="x";
 }
-export function answerVectors(p:ParsedPuzzle,genre:Genre,s:Snapshot): {expected:string[];actual:string[];edgeKeys?:string[]} {
-  const expected:string[]=[], actual:string[]=[];
+/** Only player-entered answers are sent to the checker. Clues, blanks, and notes are excluded. */
+export function answerVectors(p:ParsedPuzzle,genre:Genre,s:Snapshot): {expected:string[];actual:string[];complete:boolean} {
+  const expected:string[]=[],actual:string[]=[];
   if(genre.mode==="masyu"||genre.mode==="slitherlink"){
-    const keys=allEdges(p,genre), wanted=solutionEdges(p,genre), marked=new Set(s.edges);
-    for(const key of keys){ expected.push(wanted.has(key)?"1":"0"); actual.push(marked.has(key)?"1":"0"); }
-    return {expected,actual,edgeKeys:keys};
+    const keys=new Set(allEdges(p,genre));
+    const wanted=solutionEdges(p,genre);
+    const entered=new Set(s.edges.filter(key=>keys.has(key)));
+    for(const key of entered){expected.push(wanted.has(key)?"1":"0");actual.push("1");}
+    const complete=entered.size===wanted.size&&[...wanted].every(key=>entered.has(key));
+    return {expected,actual,complete};
   }
+  let complete=true;
   for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){
-    const key=cellKey(r,c), given=p.clues[r][c], token=p.answer[r][c];
+    if(isLocked(p,genre,r,c))continue;
+    const mark=s.marks[cellKey(r,c)];
+    if(mark===undefined||mark==="-"){complete=false;continue;}
+    const token=p.answer[r][c];
     if(genre.mode==="shade"||genre.mode==="nonogram"){
+      if(mark!=="x"&&mark!=="w"){complete=false;continue;}
       expected.push(isMarked(token,genre)?"1":"0");
-      actual.push(isLocked(p,genre,r,c) ? (isMarked(token,genre)?"1":"0") : s.marks[key]==="x"?"1":"0");
+      actual.push(mark==="x"?"1":"0");
     }else{
       expected.push(token);
-      actual.push(isLocked(p,genre,r,c)?given:(s.marks[key]||"-"));
+      actual.push(mark==="~"?"-":mark);
     }
   }
-  return {expected,actual};
+  return {expected,actual,complete};
 }
+/** Rust and web use the same result contract; mismatched positions never leave the checker. */
 export async function checkPuzzle(expected:string[],actual:string[]):Promise<Check>{
   if(isTauri()){
     try{return await invoke<Check>("check_answer",{expected,actual});}
     catch(err){console.warn("Native checker unavailable, using browser fallback",err);}
   }
-  const mismatches:number[]=[];
-  for(let i=0;i<Math.max(expected.length,actual.length);i++) if(expected[i]!==actual[i])mismatches.push(i);
-  return {correct:mismatches.length===0,mismatches,total:Math.max(expected.length,actual.length)};
+  return {hasWrong:expected.length!==actual.length||expected.some((v,i)=>v!==actual[i]),checked:actual.length};
 }
 export const blankSnapshot=():Snapshot=>({marks:{},notes:{},edges:[]});
 export function readSaved(name:string,id:string):Snapshot{
