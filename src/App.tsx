@@ -20,7 +20,7 @@ const dictionary = {
     markEmpty:"留空", enter:"输入", numberPlaceholder:"输入数字", check:"检查填写", help:"规则", pause:"保存中", saved:"进度自动保存在此设备", given:"初始提示", yours:"你的填写", legends:"棋盘图例",
     notYet:"还没有填写内容。先试试吧！", wrong:"有填写错误，请再检查一下。", good:"目前填写的内容没有错误，继续加油！", won:"恭喜完成本关！🎉", failed:"无法打开该关卡，请选择另一关。", notPlayable:"这道谜题未提供完整答案，或尺寸超过 20×20，当前版本暂不支持。",
     resetConfirm:"确定要清空这一关的所有填写吗？", noData:"未找到离线题库，请先导入谜题数据。", noMatch:"没有匹配的游戏类型。", load:"正在打开关卡…",
-    levelHint:"按编号选关，绝不随机跳转", more:"查看更多关卡", backLevels:"返回选关", tipNumber:"点击选中格子，再使用数字键盘。笔记模式可添加角标候选数；多选支持拖动选择。", tipShade:"点击格子可快速涂黑，或使用下方按钮标记白格。初始线索无法修改。", tipLoop:"沿线条滑动绘制闭环；可用撤销与重做修改路径。", tipBinary:"点选方格后填写黑或白；初始圆点不可更改。",
+    levelHint:"按编号选关，绝不随机跳转", sizeAll:"全部尺寸", sizeTitle:"棋盘尺寸", filtered:"符合条件的关卡", unavailable:"暂不可玩", more:"查看更多关卡", backLevels:"返回选关", tipNumber:"点击选中格子，再使用数字键盘。笔记模式可添加角标候选数；多选支持拖动选择。", tipShade:"点击格子可快速涂黑，或使用下方按钮标记白格。初始线索无法修改。", tipLoop:"沿线条滑动绘制闭环；可用撤销与重做修改路径。", tipBinary:"点选方格后填写黑或白；初始圆点不可更改。",
     loadError:"无法加载题库", levelsEmpty:"此类型暂无可用关卡。"
   },
   en: {
@@ -32,7 +32,7 @@ const dictionary = {
     markEmpty:"Empty",enter:"Enter",numberPlaceholder:"Number",check:"Check entries",help:"Rules",pause:"Saving",saved:"Progress is saved automatically on this device",given:"Given clue",yours:"Your entry",legends:"Board key",
     notYet:"Nothing entered yet. Give it a try!",wrong:"Some of your entries are incorrect. Have another look.",good:"No mistakes in your entries so far. Keep going!",won:"Puzzle completed! 🎉",failed:"Unable to open this level. Please choose another.",notPlayable:"This level has no complete solution or exceeds 20×20, so it is not supported yet.",
     resetConfirm:"Clear all of your entries for this level?",noData:"Offline puzzle data was not found. Import the data before running the app.",noMatch:"No matching games found.",load:"Opening level…",
-    levelHint:"Choose by number — never random",more:"Browse more levels",backLevels:"All levels",tipNumber:"Tap to select cells, then use the number pad. Notes are small candidates; Multi supports drag selection.",tipShade:"Tap to fill quickly, or mark cells as empty using the controls. Initial clues are fixed.",tipLoop:"Drag to draw a loop. Undo and redo edit your paths.",tipBinary:"Select a cell, then choose black or white. Initial circles cannot be changed.",
+    levelHint:"Choose by number — never random",sizeAll:"All sizes",sizeTitle:"Grid size",filtered:"matching levels",unavailable:"Not playable yet",more:"Browse more levels",backLevels:"All levels",tipNumber:"Tap to select cells, then use the number pad. Notes are small candidates; Multi supports drag selection.",tipShade:"Tap to fill quickly, or mark cells as empty using the controls. Initial clues are fixed.",tipLoop:"Drag to draw a loop. Undo and redo edit your paths.",tipBinary:"Select a cell, then choose black or white. Initial circles cannot be changed.",
     loadError:"Unable to load library",levelsEmpty:"No levels available in this category."
   }
 } as const;
@@ -70,6 +70,7 @@ function App() {
   const [filter,setFilter]=useState("all");
   const [chosen,setChosen]=useState<Genre|null>(null);
   const [page,setPage]=useState(0);
+  const [sizeFilter,setSizeFilter]=useState("all");
   const [active,setActive]=useState<Active|null>(null);
   const [snapshot,setSnapshot]=useState<Snapshot>(blankSnapshot());
   const [selection,setSelection]=useState<number[]>([]);
@@ -131,8 +132,9 @@ function App() {
   },[]);
   const openLevels=(genre:Genre,focus?:number)=>{
     request.current++;checkVersion.current++;
+    if(chosen?.name!==genre.name){setSizeFilter("all");setPage(0);}
     setChosen(genre);setActive(null);
-    setPage(Math.floor((focus||0)/PAGE_SIZE));setScreen("levels");
+    setScreen("levels");
     setMessage("");setResultKind("");setRulesOpen(false);
   };
   const back=()=>{
@@ -164,7 +166,7 @@ function App() {
       if(!smallEnough(parsed))throw Error(t.notPlayable);
       if(mine!==request.current)return;
       setActive({genre,record,parsed,level});
-      setChosen(genre);setPage(Math.floor(level/PAGE_SIZE));
+      setChosen(genre);
       setSnapshot(readSaved(genre.name,record.id));
       timeline.current={past:[],future:[]};
       setSelection([]);setMulti(false);setPencil(false);setInputValue("");
@@ -267,7 +269,17 @@ function App() {
   const sums={types:catalog?.types.filter(v=>GENRE_MAP.has(v.name)&&v.solved>0).length||0,puzzles:catalog?.types.reduce((n,v)=>n+v.count,0)||0};
   const entry=chosen&&catalog?.types.find(v=>v.name===chosen.name);
   const levelCount=totalLevels(entry||undefined);
-  const pageCount=Math.max(1,Math.ceil(levelCount/PAGE_SIZE));
+  // Per-level metadata is built into the offline catalog at import time.
+  // The original level number is stable even after the size filter is applied.
+  const indexedLevels: {index:number;size:string;ready:boolean}[]=[];
+  if(entry){let index=0;for(const file of entry.files){
+    for(let i=0;i<file.count;i++)indexedLevels.push({index:index+i,size:file.sizes?.[i]||"",ready:file.ready?.[i]??true});
+    index+=file.count;
+  }}
+  const sizes=[...new Set(indexedLevels.map(item=>item.size).filter(Boolean))]
+    .sort((a,b)=>{const [ar,ac]=a.split("x").map(Number),[br,bc]=b.split("x").map(Number);return ar*ac-br*bc||ar-br||ac-bc;});
+  const filteredLevels=sizeFilter==="all"?indexedLevels:indexedLevels.filter(level=>level.size===sizeFilter);
+  const pageCount=Math.max(1,Math.ceil(filteredLevels.length/PAGE_SIZE));
   const ruleGenre=active?.genre||chosen;
   const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink";
   const filled=active?Object.keys(snapshot.marks).filter(key=>snapshot.marks[key]!=="-").length:0;
@@ -321,10 +333,20 @@ function App() {
         <button className="outline-action" onClick={()=>setRulesOpen(true)}><CircleHelp size={18}/>{t.howTo}</button>
       </section>
       <div className="level-metrics"><span>{levelCount} {t.available}</span><span>{Object.keys(done).filter(k=>k.startsWith(chosen.name+":")).length} {t.solved}</span></div>
-      <div className="level-title-row"><h2>{t.levelTitle}</h2><small>{t.levelHint}</small></div>
-      <div className="level-grid">{Array.from({length:Math.min(PAGE_SIZE,Math.max(0,levelCount-page*PAGE_SIZE))},(_,i)=>{
-        const n=page*PAGE_SIZE+i+1,won=!!done[chosen.name+":"+(n-1)];
-        return <button key={n} className={"level-tile "+(won?"level-done":"")} onClick={()=>loadLevel(chosen,n-1)} disabled={loading} aria-label={levelLabel(n)}>
+      {sizes.length>0&&<section className="size-section" aria-label={t.sizeTitle}>
+        <h2>{t.sizeTitle}</h2>
+        <div className="size-chips">
+          <button className={sizeFilter==="all"?"selected":""} onClick={()=>{setSizeFilter("all");setPage(0);}}>{t.sizeAll} <span>{indexedLevels.length}</span></button>
+          {sizes.map(size=><button key={size} className={sizeFilter===size?"selected":""} onClick={()=>{setSizeFilter(size);setPage(0);}}>
+            {size.replace("x","×")} <span>{indexedLevels.filter(level=>level.size===size).length}</span>
+          </button>)}
+        </div>
+      </section>}
+      <div className="level-title-row"><h2>{t.levelTitle} · {filteredLevels.length} {t.filtered}</h2><small>{t.levelHint}</small></div>
+      <div className="level-grid">{filteredLevels.slice(page*PAGE_SIZE,(page+1)*PAGE_SIZE).map(level=>{
+        const n=level.index+1,won=!!done[chosen.name+":"+level.index];
+        return <button key={n} className={"level-tile "+(won?"level-done":"")} onClick={()=>loadLevel(chosen,level.index)} disabled={loading||!level.ready}
+          title={!level.ready?t.unavailable:level.size.replace("x","×")} aria-label={levelLabel(n)+(level.size?" "+level.size.replace("x","×"):"")}>
           <strong>{String(n).padStart(2,"0")}</strong>{won&&<CheckCircle2 size={16}/>}
         </button>;
       })}</div>
