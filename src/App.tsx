@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, CircleHelp, Eraser, Grid3X3, Layers, Pencil, Play, Redo2, RotateCcw, Search, Sparkles, Undo2, X } from "lucide-react";
 import { Board } from "./Board";
 import { GENRES, GENRE_MAP } from "./config";
@@ -271,14 +271,22 @@ function App() {
   const levelCount=totalLevels(entry||undefined);
   // Per-level metadata is built into the offline catalog at import time.
   // The original level number is stable even after the size filter is applied.
-  const indexedLevels: {index:number;size:string;ready:boolean}[]=[];
-  if(entry){let index=0;for(const file of entry.files){
-    for(let i=0;i<file.count;i++)indexedLevels.push({index:index+i,size:file.sizes?.[i]||"",ready:file.ready?.[i]??true});
-    index+=file.count;
-  }}
-  const sizes=[...new Set(indexedLevels.map(item=>item.size).filter(Boolean))]
-    .sort((a,b)=>{const [ar,ac]=a.split("x").map(Number),[br,bc]=b.split("x").map(Number);return ar*ac-br*bc||ar-br||ac-bc;});
-  const filteredLevels=sizeFilter==="all"?indexedLevels:indexedLevels.filter(level=>level.size===sizeFilter);
+  const indexedLevels=useMemo(() => {
+    const levels: {index:number;size:string;ready:boolean}[]=[];
+    if(entry){let index=0;for(const file of entry.files){
+      for(let i=0;i<file.count;i++)levels.push({index:index+i,size:file.sizes?.[i]||"",ready:file.ready?.[i]??true});
+      index+=file.count;
+    }}
+    return levels;
+  },[entry]);
+  const sizes=useMemo(() => [...new Set(indexedLevels.map(item=>item.size).filter(Boolean))]
+    .sort((a,b)=>{const [ar,ac]=a.split("x").map(Number),[br,bc]=b.split("x").map(Number);return ar*ac-br*bc||ar-br||ac-bc;}),[indexedLevels]);
+  const filteredLevels=useMemo(() => sizeFilter==="all"?indexedLevels:indexedLevels.filter(level=>level.size===sizeFilter),[indexedLevels,sizeFilter]);
+  const sizeCounts=useMemo(() => {
+    const counts:Record<string,number>={};
+    for(const level of indexedLevels)if(level.size)counts[level.size]=(counts[level.size]||0)+1;
+    return counts;
+  },[indexedLevels]);
   const pageCount=Math.max(1,Math.ceil(filteredLevels.length/PAGE_SIZE));
   const ruleGenre=active?.genre||chosen;
   const isLoop=active?.genre.mode==="masyu"||active?.genre.mode==="slitherlink";
@@ -338,7 +346,7 @@ function App() {
         <div className="size-chips">
           <button className={sizeFilter==="all"?"selected":""} onClick={()=>{setSizeFilter("all");setPage(0);}}>{t.sizeAll} <span>{indexedLevels.length}</span></button>
           {sizes.map(size=><button key={size} className={sizeFilter===size?"selected":""} onClick={()=>{setSizeFilter(size);setPage(0);}}>
-            {size.replace("x","×")} <span>{indexedLevels.filter(level=>level.size===size).length}</span>
+            {size.replace("x","×")} <span>{sizeCounts[size]||0}</span>
           </button>)}
         </div>
       </section>}
