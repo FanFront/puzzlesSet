@@ -4,20 +4,20 @@ import type { Genre, ParsedPuzzle, Snapshot } from "./types";
 
 type BoardProps = {
   parsed: ParsedPuzzle; genre: Genre; state: Snapshot; selected: number[];
-  errors: number[]; multi: boolean;
+  multi: boolean; label: string;
   onSelect: (index:number, extend:boolean)=>void;
   onTap: (index:number)=>void;
   onEdge: (key:string, action:"toggle"|"paint")=>void;
 };
 const SIZE=42;
-const COLORS={background:"#f7f4ec",ink:"#233244",selected:"#d4e8ff",user:"#2b669f",fill:"#253b50",star:"#dbad49"};
-export function Board({parsed:p,genre:g,state:s,selected,errors,multi,onSelect,onTap,onEdge}:BoardProps) {
+const COLORS={background:"#fcfbf7",ink:"#233244",selected:"#dbebff",user:"#225fc8",fill:"#26384b",star:"#dbad49"};
+export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,onTap,onEdge}:BoardProps) {
   const svg=useRef<SVGSVGElement>(null);
   const drawing=useRef<{down:boolean;lastCell:number|null;seen:Set<string>;moved:boolean;start:number|null}>({down:false,lastCell:null,seen:new Set(),moved:false,start:null});
   const x0=g.mode==="nonogram" ? Math.max(76,Math.max(...(p.rowClues||[]).map(v=>v.length),0)*15+12):8;
   const y0=g.mode==="nonogram" ? Math.max(80,Math.max(...(p.colClues||[]).map(v=>v.length),0)*15+12):8;
   const width=x0+p.cols*SIZE+8,height=y0+p.rows*SIZE+8;
-  const marked=new Set(s.edges), errorsSet=new Set(errors), selection=new Set(selected);
+  const marked=new Set(s.edges), selection=new Set(selected);
   const edges=allEdges(p,g);
   const location=(event:React.PointerEvent<SVGSVGElement>)=>{
     const rect=svg.current!.getBoundingClientRect();
@@ -98,20 +98,22 @@ export function Board({parsed:p,genre:g,state:s,selected,errors,multi,onSelect,o
   };
   const cells=Array.from({length:p.rows*p.cols},(_,i)=>({r:Math.floor(i/p.cols),c:i%p.cols,i}));
   const background=(r:number,c:number,i:number)=>{
-    const clue=p.clues[r][c],key=cellKey(r,c),v=s.marks[key];
+    const clue=p.clues[r][c],key=cellKey(r,c),v=s.marks[key],locked=isLocked(p,g,r,c);
     if(g.mode==="binary"){
-      const value=isLocked(p,g,r,c)?clue:v;
-      if(value==="b")return COLORS.fill;
-      if(value==="w")return "#ffffff";
+      const value=locked?clue:v;
+      if(value==="b")return locked?"#253342":"#245f9f";
+      if(value==="w")return locked?"#f2ede0":"#e6f0ff";
     }
-    if((g.mode==="shade"||g.mode==="nonogram")&&v==="x")return COLORS.fill;
-    return selection.has(i) ? COLORS.selected : COLORS.background;
+    if(g.mode==="shade"&&locked)return clue==="x"?"#26384b":"#eee9dc";
+    if((g.mode==="shade"||g.mode==="nonogram")&&v==="x")return "#285a94";
+    if((g.mode==="shade"||g.mode==="nonogram")&&v==="w")return "#eaf2ff";
+    return selection.has(i)?COLORS.selected:locked?"#f1ebdf":COLORS.background;
   };
   return <div className="board-scroll">
     <svg ref={svg} viewBox={"0 0 "+width+" "+height} width={width} height={height}
-         className="puzzle-board" role="grid" aria-label={g.title+" puzzle board"}
+         className="puzzle-board" role="grid" aria-label={label} style={{width:width<=600?"min(100%, "+width+"px)":width,height:"auto",touchAction:"none"}}
          onPointerDown={handleDown} onPointerMove={handleMove} onPointerUp={handleUp}
-         onPointerCancel={()=>{drawing.current.down=false;}} style={{touchAction:"none"}}>
+         onPointerCancel={()=>{drawing.current.down=false;}}>
       <rect width={width} height={height} fill="#e6e2d8" rx="9"/>
       {g.mode==="nonogram"&& <>
         {(p.rowClues||[]).map((clues,r)=><text key={"r"+r} x={x0-10} y={y0+(r+0.67)*SIZE}
@@ -140,15 +142,15 @@ export function Board({parsed:p,genre:g,state:s,selected,errors,multi,onSelect,o
           <rect x={x} y={y} width={SIZE} height={SIZE} fill={background(r,c,i)}
             stroke="#c6c8c6" strokeWidth="0.7"/>
           {selection.has(i)&&<rect x={x+2} y={y+2} width={SIZE-4} height={SIZE-4} fill="none" stroke="#5191d4" strokeWidth="2" rx="2"/>}
-          {errorsSet.has(i)&&<rect x={x+2} y={y+2} width={SIZE-4} height={SIZE-4} stroke="#d45253" fill="none" strokeWidth="3"/>}
-          {g.clueOnly&&clue!=="-"&&<text x={x+3} y={y+11} fontSize="10" fill="#7b6a3a">{clue}</text>}
-          {g.mode==="number"&& displayed && displayed!=="-" &&
+
+          {g.clueOnly&&clue!=="-"&&<text x={x+3} y={y+11} fontSize="10" fontWeight="800" fill="#806542">{clue}</text>}
+          {g.mode==="number"&& displayed && displayed!=="-" && displayed!=="~" &&
             <text x={x+SIZE/2} y={y+SIZE/2+9} fontSize={String(displayed).length>2?15:22}
-              fontWeight={locked?"750":"600"} fill={locked?"#263447":"#2d6cab"}
+              fontWeight={locked?"800":"650"} fill={locked?"#293344":"#2469bf"}
               textAnchor="middle">{displayed}</text>}
           {g.mode==="binary" && (displayed==="w"||displayed==="b") && 
-            <circle cx={x+SIZE/2} cy={y+SIZE/2} r="11" stroke={displayed==="b"?"#e0e5e7":"#39485b"}
-              strokeWidth="2" fill={displayed==="b"?"#162639":"#fff"}/>}
+            <circle cx={x+SIZE/2} cy={y+SIZE/2} r="11" stroke={locked?"#cbb47d":displayed==="b"?"#e1efff":"#287acb"}
+              strokeWidth="2" fill={displayed==="b"?(locked?"#162639":"#2469bf"):"#fff"}/>}
           {(g.mode==="shade"||g.mode==="nonogram") && g.name==="Starbattle"&&hasShade &&
             <text x={x+SIZE/2} y={y+SIZE/2+9} textAnchor="middle" fontSize="27" fill="#e5b95b">★</text>}
           {(g.mode==="shade"||g.mode==="nonogram") && g.name==="Akari"&&hasShade &&
@@ -162,8 +164,12 @@ export function Board({parsed:p,genre:g,state:s,selected,errors,multi,onSelect,o
             <text x={x+SIZE/2} y={y+SIZE/2+7} textAnchor="middle" fontSize="20" fill="#253447">{clue}</text>}
           {g.mode==="masyu"&&(clue==="b"||clue==="w")&&
             <circle cx={x+SIZE/2} cy={y+SIZE/2} r="10" fill={clue==="b"?"#273747":"#fff"} stroke="#263747" strokeWidth="2"/>}
+          {g.mode==="number"&&!locked&&v==="~"&&
+            <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="20" fill="#2469bf">·</text>}
+          {(g.mode==="shade"||g.mode==="nonogram")&&v==="w"&&
+            <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="22" fontWeight="800" fill="#8ba7c9">×</text>}
           {g.mode==="number"&&!locked&&(s.notes[key]||[]).map((v,j)=><text key={j}
-            x={x+4+(j%3)*12} y={y+10+Math.floor(j/3)*11} fontSize="9" fill="#748a9e">{v}</text>)}
+            x={x+4+(j%3)*12} y={y+10+Math.floor(j/3)*11} fontSize="9" fontWeight="650" fill="#6b87b0">{v}</text>)}
           {p.regions&&<>
             {border("top")&&<line x1={x} y1={y} x2={x+SIZE} y2={y} stroke="#526274" strokeWidth="2.7"/>}
             {border("left")&&<line x1={x} y1={y} x2={x} y2={y+SIZE} stroke="#526274" strokeWidth="2.7"/>}
