@@ -1,0 +1,331 @@
+{
+  "source": "https://github.com/SmilingWayne/puzzlekit-dataset",
+  "imported_at": "2026-10-29T00:00:00+00:00",
+  "seed_sample": true,
+  "types": [
+    {
+      "name": "Sudoku",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Sudoku/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Hidoku",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Hidoku/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Hakyuu",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Hakyuu/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Suguru",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Suguru/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "JigsawSudoku",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "JigsawSudoku/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "KenKen",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "KenKen/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "KillerSudoku",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "KillerSudoku/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Cojun",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Cojun/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Fuzuli",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Fuzuli/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Binairo",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Binairo/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "YinYang",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "YinYang/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Hitori",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Hitori/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Nurikabe",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Nurikabe/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Kurotto",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Kurotto/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Kuromasu",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Kuromasu/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Norinori",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Norinori/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Heyawake",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Heyawake/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Chocona",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Chocona/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "LITS",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "LITS/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Starbattle",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Starbattle/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Minesweeper",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Minesweeper/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Akari",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Akari/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Shimaguni",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Shimaguni/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Mosaic",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Mosaic/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Nonogram",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Nonogram/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Masyu",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Masyu/000.json",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "name": "Slitherlink",
+      "count": 18,
+      "solved": 18,
+      "playable": true,
+      "files": [
+        {
+          "path": "Slitherlink/000.json",
+          "count": 18
+        }
+      ]
+    }
+  ]
+}
