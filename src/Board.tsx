@@ -136,7 +136,7 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
         };
         const sudokuBox = g.name==="Sudoku" && p.rows===9 && p.cols===9;
         const hasShade=(g.mode==="shade"||g.mode==="nonogram")&&v==="x";
-        const displayed = g.mode==="number" ? (g.clueOnly?v:locked?clue:v) :
+        const displayed = (g.mode==="number"||g.mode==="symbols") ? (g.clueOnly?v:locked?clue:v) :
           g.mode==="binary" ? (locked?clue:v) : "";
         return <g key={i} role="gridcell" aria-label={"row "+(r+1)+" column "+(c+1)}>
           <rect x={x} y={y} width={SIZE} height={SIZE} fill={background(r,c,i)}
@@ -144,7 +144,7 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
           {selection.has(i)&&<rect x={x+2} y={y+2} width={SIZE-4} height={SIZE-4} fill="none" stroke="#5191d4" strokeWidth="2" rx="2"/>}
 
           {g.clueOnly&&clue!=="-"&&<text x={x+3} y={y+11} fontSize="10" fontWeight="800" fill="#806542">{clue}</text>}
-          {g.mode==="number"&& displayed && displayed!=="-" && displayed!=="~" &&
+          {(g.mode==="number"||g.mode==="symbols")&& displayed && displayed!=="-" && displayed!=="~" &&
             <text x={x+SIZE/2} y={y+SIZE/2+9} fontSize={String(displayed).length>2?15:22}
               fontWeight={locked?"800":"650"} fill={locked?"#293344":"#2469bf"}
               textAnchor="middle">{displayed}</text>}
@@ -160,11 +160,19 @@ export function Board({parsed:p,genre:g,state:s,selected,multi,label,onSelect,on
           {g.mode==="shade"&&locked&&clue!=="-"&&
             <text x={x+SIZE/2} y={y+SIZE/2+7} fill={clue==="x"?"#fff":"#3c4855"}
               fontSize={clue.length>2?12:19} textAnchor="middle" fontWeight="650">{clue==="o"?"○":clue==="x"?"■":clue}</text>}
+          {g.mode==="shade"&&!locked&&clue!=="-"&&clue!=="."&&
+            <text x={x+SIZE/2} y={y+SIZE/2+7} fontWeight="700" textAnchor="middle"
+              fontSize={clue.length>3?12:18} fill={v==="x"?"#ffffff":"#41566e"}>{clue}</text>}
+          {g.adaptive&&(g.mode==="number"||g.mode==="symbols")&&!locked&&clue!=="-"&&clue!=="."&&
+            <text x={x+3} y={y+10} fontSize="10" fontWeight="700" fill="#876f4d">{clue}</text>}
+          {g.adaptive&&g.mode==="masyu"&&clue!=="-"&&clue!=="b"&&clue!=="w"&&
+            <text x={x+SIZE/2} y={y+SIZE/2+6} fontSize={clue.length>3?10:15}
+              fontWeight="700" textAnchor="middle" fill="#635472">{clue}</text>}
           {g.mode==="slitherlink"&&clue!=="-"&&
             <text x={x+SIZE/2} y={y+SIZE/2+7} textAnchor="middle" fontSize="20" fill="#253447">{clue}</text>}
           {g.mode==="masyu"&&(clue==="b"||clue==="w")&&
             <circle cx={x+SIZE/2} cy={y+SIZE/2} r="10" fill={clue==="b"?"#273747":"#fff"} stroke="#263747" strokeWidth="2"/>}
-          {g.mode==="number"&&!locked&&v==="~"&&
+          {(g.mode==="number"||g.mode==="symbols")&&!locked&&v==="~"&&
             <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="20" fill="#2469bf">·</text>}
           {(g.mode==="shade"||g.mode==="nonogram")&&v==="w"&&
             <text x={x+SIZE/2} y={y+SIZE/2+6} textAnchor="middle" fontSize="22" fontWeight="800" fill="#8ba7c9">×</text>}
